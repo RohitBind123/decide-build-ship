@@ -1,0 +1,50 @@
+{
+  "name": "@rohit_1/decide-build-ship",
+  "version": "0.2.1",
+  "description": "A decision-first product workflow for Claude Code: discover, decide, plan, design, build, verify, ship, autopilot, overview and handoff skills, plus review agents. Installs into .claude with one command.",
+  "keywords": [
+    "claude",
+    "claude-code",
+    "agent-skills",
+    "skills",
+    "plugin",
+    "workflow",
+    "product-discovery",
+    "prd",
+    "tdd",
+    "autonomous"
+  ],
+  "homepage": "https://github.com/RohitBind123/decide-build-ship#readme",
+  "bugs": {
+    "url": "https://github.com/RohitBind123/decide-build-ship/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RohitBind123/decide-build-ship.git"
+  },
+  "license": "MIT",
+  "author": "RohitBind123 (https://github.com/RohitBind123)",
+  "type": "module",
+  "bin": {
+    "decide-build-ship": "cli/index.mjs"
+  },
+  "files": [
+    "cli/index.mjs",
+    "skills/",
+    "agents/",
+    "hooks/",
+    ".claude-plugin/",
+    "docs/",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test cli/index.test.mjs && python3 scripts/check_skills.py",
+    "prepublishOnly": "npm test"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
