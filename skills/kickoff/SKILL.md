@@ -16,6 +16,9 @@ in the project's `CLAUDE.md`. This skill writes that section and the files it po
   repository; leave it as `<not set>` and ask.
 - Show the full diff of every file you will write, then ask with the AskUserQuestion tool: "Write these files"
   or "Change some".
+- Write nothing until the owner has answered. If the question tool is denied or unavailable, show the proposal
+  and the questions as numbered plain text and stop there; filling values in yourself and asking afterwards is
+  not confirmation.
 
 Copy this checklist into your reply:
 
