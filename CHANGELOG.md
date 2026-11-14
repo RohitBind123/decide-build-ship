@@ -34,6 +34,8 @@ All notable changes to this project are recorded here. The format follows
   `kickoff` asks about autonomy and adds the `Roadmap`, `Design system`, `Autonomy` and `Max parallel slices`
   keys.
 - README rewritten with badges, the full skill map and a quick start.
+- `ship-slice` now also triggers on requests to force-push, rewrite or clean up a shared branch's history, or to
+  merge without checking; the full eval suite passes (17 of 17, one run each).
 
 ## [0.1.0] - 2026-11-14
 
