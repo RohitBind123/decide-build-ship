@@ -18,3 +18,10 @@ jobs:
           python-version: "3.12"
       - name: Structural checks for skills, manifests and eval cases
         run: python3 scripts/check_skills.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Installer CLI tests
+        run: node --test cli/index.test.mjs
+      - name: Package contents
+        run: npm pack --dry-run

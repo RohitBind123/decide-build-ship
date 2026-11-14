@@ -5,6 +5,8 @@
 <p align="center">
   <a href="https://github.com/RohitBind123/decide-build-ship/actions/workflows/check.yml"><img src="https://img.shields.io/github/actions/workflow/status/RohitBind123/decide-build-ship/check.yml?branch=main&label=checks" alt="Checks"></a>
   <a href=".claude-plugin/plugin.json"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FRohitBind123%2Fdecide-build-ship%2Fmain%2F.claude-plugin%2Fplugin.json&query=%24.version&label=version&color=blue" alt="Version"></a>
+  <a href="https://www.npmjs.com/package/@rohit_1/decide-build-ship"><img src="https://img.shields.io/npm/v/@rohit_1/decide-build-ship?label=npm" alt="npm"></a>
+  <a href="https://www.npmjs.com/package/@rohit_1/decide-build-ship"><img src="https://img.shields.io/npm/dm/@rohit_1/decide-build-ship?label=downloads" alt="npm downloads"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/RohitBind123/decide-build-ship" alt="License: MIT"></a>
   <a href="https://code.claude.com/docs/en/plugins"><img src="https://img.shields.io/badge/Claude%20Code-plugin-d97757" alt="Claude Code plugin"></a>
   <img src="https://img.shields.io/badge/skills-11-informational" alt="11 skills">
@@ -29,6 +31,13 @@ assumes no stack, language, hosting or country.
 ```text
 /plugin marketplace add RohitBind123/decide-build-ship
 /plugin install decide-build-ship@decide-build-ship
+```
+
+Or, without the plugin system, copy the skills and agents into your project with npm:
+
+```bash
+npx @rohit_1/decide-build-ship install          # into ./.claude
+npx @rohit_1/decide-build-ship install --user   # into ~/.claude, for all projects
 ```
 
 Then, in your project:
@@ -167,6 +176,19 @@ claude plugin install decide-build-ship@decide-build-ship
 Plugin skills are namespaced: `/decide-build-ship:discover`, `/decide-build-ship:autopilot` and so on. The
 plugin also installs the agents and the SessionStart hook.
 
+### With npm
+
+```bash
+npx @rohit_1/decide-build-ship install            # skills and agents into ./.claude
+npx @rohit_1/decide-build-ship install --user     # into ~/.claude
+npx @rohit_1/decide-build-ship install --dry-run  # show what would be copied
+npx @rohit_1/decide-build-ship list               # what is included
+npx @rohit_1/decide-build-ship plugin             # the plugin install commands
+```
+
+It never overwrites a skill or agent you already have with the same name. The SessionStart hook comes only with
+the plugin install.
+
 ### As plain skill folders
 
 ```bash
@@ -207,6 +229,7 @@ See [docs/companion-skills.md](docs/companion-skills.md).
 
 ```bash
 python3 scripts/check_skills.py                                   # structural lint, free
+node --test cli/index.test.mjs                                    # installer CLI tests, free
 claude plugin validate . --strict                                 # official validator, free
 claude plugin eval . --allow-tools Write --no-publish             # behavioural evals, uses model calls
 ```

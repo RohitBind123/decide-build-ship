@@ -16,6 +16,15 @@ under 1,024 characters and says when to use the skill, that only portable frontm
 `SKILL.md` body is under 500 lines, that every relative link resolves, that long reference files have a
 contents list, that the manifests agree, and that every eval case has a prompt and at least one typed grader.
 
+## 1b. Installer CLI tests (free, no network)
+
+```bash
+node --test cli/index.test.mjs
+```
+
+They run the npm installer against temporary folders: project and user installs, never overwriting, dry
+run, skills only, `--dir`, `list`, `plugin`, version, and bad arguments.
+
 ## 2. Plugin validator (free, no network)
 
 ```bash

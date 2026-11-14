@@ -59,9 +59,9 @@ one case where it must fire, and the negative cases must keep passing.
 
 ## Releases
 
-Maintainers bump `version` in `.claude-plugin/plugin.json`, move the `Unreleased` entries under the new
+Maintainers bump `version` in `.claude-plugin/plugin.json` and `package.json` (the lint fails if they differ), move the `Unreleased` entries under the new
 version in `CHANGELOG.md`, and tag the release (`claude plugin tag .` creates a `{name}--v{version}` tag after
-checking the manifests agree).
+checking the manifests agree), and publish to npm with `npm publish` (which runs `npm test` first).
 
 ## License
 

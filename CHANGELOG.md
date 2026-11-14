@@ -6,6 +6,16 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-15
+
+### Added
+
+- npm package `@rohit_1/decide-build-ship` with a zero-dependency installer:
+  `npx @rohit_1/decide-build-ship install [--user | --dir <path>] [--skills-only] [--dry-run]`, plus `list`
+  and `plugin`. It never overwrites existing skills or agents.
+- The lint checks that `package.json` and `plugin.json` versions match; CI runs the CLI tests and
+  `npm pack --dry-run`.
+
 ## [0.2.0] - 2026-11-15
 
 ### Added

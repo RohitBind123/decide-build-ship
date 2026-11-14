@@ -135,6 +135,17 @@ def check_manifests(root: Path, errors: list[str]) -> None:
         errors.append("marketplace.json: no plugin entry whose name matches plugin.json")
     if any(entry.get("version") for entry in entries):
         errors.append("marketplace.json: keep the version in plugin.json only, so the two cannot disagree")
+    package_json = root / "package.json"
+    if package_json.is_file():
+        try:
+            package_version = json.loads(package_json.read_text(encoding="utf-8")).get("version")
+        except json.JSONDecodeError as exc:
+            errors.append(f"package.json: invalid JSON: {exc}")
+            return
+        if package_version != plugin.get("version"):
+            errors.append(
+                f"package.json version {package_version} must match plugin.json version {plugin.get('version')}"
+            )
 
 
 def check_evals(root: Path, skill_names: list[str], errors: list[str]) -> int:
