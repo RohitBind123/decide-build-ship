@@ -6,6 +6,18 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-11-15
+
+### Changed
+
+- The source repository is private, so npm is now the install path for everyone.
+  `npx @rohit_1/decide-build-ship plugin` copies the full plugin (skills, agents, hook) to
+  `~/.decide-build-ship/plugin` and prints the `claude plugin marketplace add` and `install` commands; run
+  again, it updates its own copy and never replaces a folder it did not create.
+- README badges come from npm instead of GitHub; the banner and doc links point at the published package
+  files on jsDelivr, so they work on the npm page.
+- `package.json` and `plugin.json` no longer point at the private repository.
+
 ## [0.2.1] - 2026-11-15
 
 ### Added

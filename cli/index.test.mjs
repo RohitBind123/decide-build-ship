@@ -84,11 +84,48 @@ test("list prints every skill and agent", () => {
   for (const agent of AGENTS) assert.match(res.stdout, new RegExp(`\\b${agent.replace(".md", "")}\\b`));
 });
 
-test("plugin prints the marketplace install commands", () => {
-  const res = run(["plugin"]);
+test("plugin copies the full plugin to ~/.decide-build-ship/plugin and prints the local install commands", () => {
+  const home = mkdtempSync(join(tmpdir(), "dbs-home-"));
+  const res = run(["plugin"], { home });
   assert.equal(res.status, 0, res.stderr);
-  assert.match(res.stdout, /plugin marketplace add RohitBind123\/decide-build-ship/);
-  assert.match(res.stdout, /plugin install decide-build-ship@decide-build-ship/);
+  const target = join(home, ".decide-build-ship", "plugin");
+  for (const path of [".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", "hooks/hooks.json",
+    "hooks/session-start.sh", "skills/decide/SKILL.md", "agents/code-reviewer.md"]) {
+    assert.ok(existsSync(join(target, path)), `missing ${path}`);
+  }
+  assert.ok(res.stdout.includes(`claude plugin marketplace add "${target}"`), res.stdout);
+  assert.match(res.stdout, /claude plugin install decide-build-ship@decide-build-ship/);
+  assert.doesNotMatch(res.stdout, /RohitBind123\/decide-build-ship/);
+});
+
+test("plugin run again replaces its own earlier copy (an update)", () => {
+  const home = mkdtempSync(join(tmpdir(), "dbs-home-"));
+  run(["plugin"], { home });
+  const stale = join(home, ".decide-build-ship", "plugin", "skills", "old-skill");
+  mkdirSync(stale, { recursive: true });
+  const res = run(["plugin"], { home });
+  assert.equal(res.status, 0, res.stderr);
+  assert.ok(!existsSync(stale), "stale files from the earlier copy should be gone");
+  assert.match(res.stdout, /marketplace update decide-build-ship/);
+});
+
+test("plugin refuses to replace a folder that is not its own copy", () => {
+  const home = mkdtempSync(join(tmpdir(), "dbs-home-"));
+  const target = join(home, ".decide-build-ship", "plugin");
+  mkdirSync(target, { recursive: true });
+  writeFileSync(join(target, "notes.txt"), "someone else's file");
+  const res = run(["plugin"], { home });
+  assert.equal(res.status, 1);
+  assert.match(res.stderr, /not a decide-build-ship plugin copy/i);
+  assert.equal(readFileSync(join(target, "notes.txt"), "utf8"), "someone else's file");
+});
+
+test("plugin --dry-run writes nothing", () => {
+  const home = mkdtempSync(join(tmpdir(), "dbs-home-"));
+  const res = run(["plugin", "--dry-run"], { home });
+  assert.equal(res.status, 0, res.stderr);
+  assert.ok(!existsSync(join(home, ".decide-build-ship")));
+  assert.match(res.stdout, /would copy/i);
 });
 
 test("--version prints the package version, which matches the plugin manifest", () => {

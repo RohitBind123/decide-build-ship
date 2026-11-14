@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // Installer for the decide-build-ship skills and agents.
-// Zero dependencies. Copies files into .claude/ and never overwrites anything that already exists.
+// Zero dependencies. `install` copies into .claude/ and never overwrites anything that already exists.
+// `plugin` keeps its own copy of the full plugin in ~/.decide-build-ship/plugin and replaces only that copy.
 
-import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,8 +11,10 @@ import { fileURLToPath } from "node:url";
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SKILLS_DIR = join(PACKAGE_ROOT, "skills");
 const AGENTS_DIR = join(PACKAGE_ROOT, "agents");
-const REPO = "RohitBind123/decide-build-ship";
-const PLUGIN = "decide-build-ship@decide-build-ship";
+const PLUGIN_NAME = "decide-build-ship";
+const PLUGIN = `${PLUGIN_NAME}@${PLUGIN_NAME}`;
+// Everything Claude Code needs to load the package as a plugin.
+const PLUGIN_PARTS = [".claude-plugin", "skills", "agents", "hooks", "README.md", "LICENSE"];
 const INSTALL_FLAGS = new Set(["--user", "--dry-run", "--skills-only", "--dir"]);
 
 const USAGE = `decide-build-ship: a decision-first product workflow for Claude Code
@@ -19,7 +22,8 @@ const USAGE = `decide-build-ship: a decision-first product workflow for Claude C
 Usage:
   npx @rohit_1/decide-build-ship install [options]   copy skills and agents into .claude/
   npx @rohit_1/decide-build-ship list                list the skills and agents
-  npx @rohit_1/decide-build-ship plugin              show how to install it as a Claude Code plugin
+  npx @rohit_1/decide-build-ship plugin [--dry-run]  copy the full plugin to ~/.decide-build-ship/plugin
+                                                     and print the commands to install it
   npx @rohit_1/decide-build-ship --version | --help
 
 Install options:
@@ -32,6 +36,7 @@ Existing skills and agents with the same name are never overwritten.
 The plugin install (see "plugin") also adds the SessionStart resume hook.`;
 
 class UsageError extends Error {}
+class InstallError extends Error {}
 
 function readVersion() {
   return JSON.parse(readFileSync(join(PACKAGE_ROOT, "package.json"), "utf8")).version;
@@ -138,16 +143,54 @@ function list() {
   }
 }
 
-function plugin() {
-  console.log(`Install as a Claude Code plugin (skills, agents and the SessionStart hook).
+function pluginTarget() {
+  return join(homedir(), ".decide-build-ship", "plugin");
+}
 
-In Claude Code:
-  /plugin marketplace add ${REPO}
-  /plugin install ${PLUGIN}
+function isOwnCopy(dir) {
+  try {
+    const manifest = JSON.parse(readFileSync(join(dir, ".claude-plugin", "plugin.json"), "utf8"));
+    return manifest.name === PLUGIN_NAME;
+  } catch {
+    return false;
+  }
+}
 
-From a shell:
-  claude plugin marketplace add ${REPO}
-  claude plugin install ${PLUGIN}`);
+function plugin(args) {
+  const unknown = args.filter((arg) => arg !== "--dry-run");
+  if (unknown.length > 0) throw new UsageError(`unknown option: ${unknown[0]}`);
+  const dryRun = args.includes("--dry-run");
+  const target = pluginTarget();
+  const updating = existsSync(target);
+  if (updating && !isOwnCopy(target)) {
+    throw new InstallError(`${target} exists and is not a decide-build-ship plugin copy; move it away first`);
+  }
+
+  if (dryRun) {
+    console.log(`Dry run: would copy the plugin (${PLUGIN_PARTS.join(", ")}) to ${target}`);
+    return;
+  }
+  if (updating) rmSync(target, { recursive: true, force: true });
+  mkdirSync(target, { recursive: true });
+  for (const part of PLUGIN_PARTS) {
+    const from = join(PACKAGE_ROOT, part);
+    if (existsSync(from)) cpSync(from, join(target, part), { recursive: true });
+  }
+
+  console.log(`Copied the plugin (version ${readVersion()}) to ${target}\n`);
+  if (updating) {
+    console.log("Updated an earlier copy. To load the new version, run:");
+    console.log(`  claude plugin marketplace update ${PLUGIN_NAME}`);
+    console.log(`  claude plugin update ${PLUGIN}`);
+    return;
+  }
+  console.log(`Install it (skills, agents and the SessionStart resume hook) with:
+  claude plugin marketplace add "${target}"
+  claude plugin install ${PLUGIN}
+
+Or inside Claude Code:
+  /plugin marketplace add ${target}
+  /plugin install ${PLUGIN}`);
 }
 
 function main(argv) {
@@ -155,9 +198,9 @@ function main(argv) {
   if (!command || command === "--help" || command === "-h" || command === "help") return console.log(USAGE);
   if (command === "--version" || command === "-v") return console.log(readVersion());
   if (command === "install") return install(rest);
+  if (command === "plugin") return plugin(rest);
   if (rest.length > 0) throw new UsageError(`unexpected arguments: ${rest.join(" ")}`);
   if (command === "list") return list();
-  if (command === "plugin") return plugin();
   throw new UsageError(`unknown command: ${command}`);
 }
 
