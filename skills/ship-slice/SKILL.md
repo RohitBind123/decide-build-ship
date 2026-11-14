@@ -1,6 +1,6 @@
 ---
 name: ship-slice
-description: Merges and releases safely - only when the gate is green on the exact commit, the live check passed, user-facing wording is approved, and the owner has approved the merge (asked with AskUserQuestion, or covered by a recorded standing approval). Never force-pushes or rebases shared branches, never pushes to an unconfigured remote, never skips hooks. Covers the release to production, the after-merge wrap-up (doc statuses, changelog, backlog, handoff) and worktree cleanup. Use when a verified slice is ready to merge, when someone asks to merge, ship, release or deploy, or to push to a shared branch, and after a merge to tidy up.
+description: Merges and releases safely - only when the gate is green on the exact commit, the live check passed, user-facing wording is approved, and the owner has approved the merge (asked with AskUserQuestion, or covered by a recorded standing approval). Never force-pushes or rebases shared branches, never pushes to an unconfigured remote, never skips hooks. Covers the release to production, the after-merge wrap-up (doc statuses, changelog, backlog, handoff) and worktree cleanup. Use when a verified slice is ready to merge, when someone asks to merge, ship, release or deploy, or to push to a shared branch, and after a merge to tidy up. Always use it when someone asks to force-push, rewrite, squash or clean up the history of a shared branch such as main, or says to merge or push without checking with them.
 license: MIT
 ---
 
