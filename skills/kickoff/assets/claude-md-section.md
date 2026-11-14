@@ -1,11 +1,12 @@
 ## Build workflow
 
-This project uses the decide, plan-slice, build-slice, verify-slice, ship-slice and handoff skills. The skills
-read the keys below; change a value here, not in the skills.
+This project uses the decide-build-ship skills: discover, decide, plan-slice, design-ui, build-slice,
+verify-slice, ship-slice, autopilot, overview and handoff. The skills read the keys below; change a value here,
+not in the skills.
 
 ### Product
 
-- Product type: <web app | mobile app | backend system | AI or agent product | startup MVP>
+- Product type: <web app | mobile app | desktop app | backend system | AI or agent product | startup MVP>
 - Product facts: <facts that change decisions, for example "production holds only test data">
 - Review perspectives: users and roles, buyer or owner, end customer, business and support, data and
   reporting, security and privacy, engineering cost<, AI and model risks>
@@ -13,6 +14,8 @@ read the keys below; change a value here, not in the skills.
 ### Paths
 
 - Spec: `docs/spec/` (the floor: build to it or better)
+- Roadmap: `docs/spec/roadmap.md`
+- Design system: `docs/spec/design-system.md`
 - Decisions log: `docs/decisions.md`
 - Feature docs: `docs/features/` (template `_TEMPLATE.md`)
 - ADRs: `docs/adr/` (template `_TEMPLATE.md`)
@@ -51,12 +54,15 @@ read the keys below; change a value here, not in the skills.
 - Reviewers: a code reviewer per language touched; a security reviewer for input, auth, data access, secrets
   and money; a database reviewer for migrations and heavy queries; a content reviewer for user-facing text.
 - One git worktree per builder; one writer per file set; at most <2-3> builders doing heavy work at once.
+- Max parallel slices (autopilot): <2>
 
 ### Approvals
 
 - Always ask the owner (with AskUserQuestion) before: merging, pushing a shared branch, releasing, adding a
   dependency, spending money, deleting data.
 - Standing approvals: see the "Standing approvals" section of the decisions log.
+- Autonomy: <milestone | per merge>. `milestone`: autopilot merges verified slices under a merge approval the
+  owner gives once per milestone. Releases, money, new dependencies and deleting data always ask.
 
 ### Rules
 

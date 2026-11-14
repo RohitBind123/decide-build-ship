@@ -45,14 +45,15 @@ Kickoff progress:
 
 Explain each choice in plain words, then ask (up to four questions per dialog round):
 
-1. Product type: web app, mobile app, backend system, AI or agent product, startup MVP (several may apply).
-   This decides which review perspectives and checks are on.
+1. Product type: web app, mobile app, desktop app, backend system, AI or agent product, startup MVP (several
+   may apply). This decides which review perspectives and checks are on.
 2. Paths: spec, decisions log, feature docs, ADRs, evidence, handoff file. Recommend the defaults in the
    template unless the project already has a place.
 3. Branches and merge style: integration and production branches, slice branch pattern, fast-forward merges or
    pull requests, the only remote to push to.
-4. Approvals: what always needs the owner (merge, push, release, new dependency, spending money) and any
-   standing approvals.
+4. Approvals and autonomy: what always needs the owner (merge, push, release, new dependency, spending
+   money), any standing approvals, and how far `autopilot` may go (default: merges approved once per
+   milestone; releases, money, dependencies and deleting data always ask).
 
 ## 3. Write the CLAUDE.md section
 
@@ -68,7 +69,7 @@ skill's folder.
 | Create | From |
 |---|---|
 | Decisions log | `../decide/assets/decision-log.md` |
-| Spec (only if the owner wants a blank one now) | `../decide/assets/spec-template.md` |
+| Spec (only if the owner wants a blank one now; otherwise `discover` writes the spec suite) | `../decide/assets/spec-template.md` |
 | Feature doc template (`_TEMPLATE.md` in the feature docs folder) | `../plan-slice/assets/feature-doc.md` |
 | ADR template (`_TEMPLATE.md` in the ADR folder) | `../plan-slice/assets/adr.md` |
 | Evidence summary template (in the evidence folder) | `../verify-slice/assets/gate-evidence.md` |
@@ -83,4 +84,5 @@ edits, leave it uncommitted and tell the owner.
 
 ## 5. Next
 
-Usually `decide`: read the spec, or write a one-page spec with the owner if there is none.
+No spec yet for a new product or MVP: `discover`. A spec exists: `decide`, starting from it. Spec and roadmap
+approved and the owner wants Claude to keep going: `autopilot`.

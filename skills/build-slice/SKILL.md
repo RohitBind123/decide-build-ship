@@ -62,7 +62,8 @@ Use parallel sub-agents only for independent file sets. Full briefing template a
 [references/parallel-agents.md](references/parallel-agents.md). The rules:
 
 - **One worktree per builder** (the Agent tool's worktree isolation, or `git worktree add`). A worktree may
-  start on an old commit: the builder's first command creates its branch from the slice head sha.
+  start on an old commit: the builder's first command creates its branch from the slice head sha. With the
+  plugin installed, the `slice-builder` agent already runs in a worktree with these rules.
 - **One writer per file set.** No two builders edit the same file. Shared files (a router, a registry, a lock
   file) belong to one builder or to you.
 - **A model per task**, from `Models per task` in `CLAUDE.md`. Default: the smallest fast model for search,
