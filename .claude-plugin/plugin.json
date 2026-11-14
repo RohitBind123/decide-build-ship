@@ -1,8 +1,8 @@
 {
   "name": "decide-build-ship",
   "displayName": "Decide, Build, Ship",
-  "version": "0.1.0",
-  "description": "A decision-first workflow for building a product end to end with Claude: settle decisions against the spec and review the owner's answers before building, then plan thin slices, build with TDD and parallel agents, verify with a changed-only gate and a live check, ship only when green and approved, and hand off safely across sessions.",
+  "version": "0.2.0",
+  "description": "A complete, decision-first product workflow for Claude Code: discover the product with expert research and a guided interview, settle decisions and review the owner's answers, plan thin slices, design the interface, build test-first with parallel agents, verify with a changed-only gate and a live check, ship only when green and approved, run the loop autonomously per milestone, report progress on request, and hand off safely across sessions.",
   "author": {
     "name": "RohitBind123",
     "email": "rohit@staquest.com",
@@ -13,11 +13,17 @@
   "license": "MIT",
   "keywords": [
     "workflow",
+    "product-discovery",
+    "prd",
+    "spec",
     "decisions",
     "planning",
+    "design-system",
+    "accessibility",
     "tdd",
     "verification",
     "release",
+    "autonomous",
     "handoff",
     "ai-products"
   ]

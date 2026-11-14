@@ -24,6 +24,15 @@ does it help most builders, and does it keep each skill short?
 - Plain, short sentences. Imperative mood for instructions. One term per concept.
 - No dates or version numbers in instructions; put dated facts in `docs/research-notes.md`.
 
+## Writing agents and hooks
+
+- Agents in `agents/` need `name` (matching the file name) and a `description` that says when to use the agent.
+  Give each the fewest tools it needs; reviewers and researchers are read-only. Do not use `hooks`,
+  `mcpServers` or `permissionMode` in agent frontmatter: Claude Code ignores them for plugin agents.
+- Hooks in `hooks/hooks.json` run on every session of everyone who installs the plugin. Keep them fast,
+  POSIX `sh` with no dependencies, always exiting 0 unless they must block, never reading `.env` files or
+  secrets, and printing short factual statements.
+
 ## Checks
 
 Run before every commit:

@@ -9,7 +9,9 @@ evals that call the model.
 python3 scripts/check_skills.py
 ```
 
-It checks that every skill's `name` matches its folder and follows the naming rules, that each description is
+It also checks that each plugin agent in `agents/` has a name matching its file, a description that says when
+to use it, a known model and no keys that plugin agents ignore, and that every script `hooks/hooks.json` runs
+exists. For skills, it checks that every skill's `name` matches its folder and follows the naming rules, that each description is
 under 1,024 characters and says when to use the skill, that only portable frontmatter keys are used, that each
 `SKILL.md` body is under 500 lines, that every relative link resolves, that long reference files have a
 contents list, that the manifests agree, and that every eval case has a prompt and at least one typed grader.
@@ -45,6 +47,10 @@ negative cases check that unrelated or small requests do not start any workflow 
 | no-trigger-general-question | A general question starts no workflow skill |
 | no-trigger-trivial-edit | A trivial edit starts no workflow skill and is just done |
 | build-slice-near-miss | A small self-contained coding request is done directly, without the slice workflow |
+| discover-new-product | A new product idea starts `discover`: framing, research, recommended answers, suggested features, the spec suite |
+| autopilot-keep-going | "Build the whole milestone" starts `autopilot`, which asks for a recorded milestone merge approval and keeps every gate |
+| overview-where-are-we | A progress question starts `overview`, which reports only what it read and changes nothing |
+| design-ui-generic-screen | "Make it look professional" starts `design-ui`: design system, every screen state, accessibility, screenshot review |
 
 ### How the score works
 
@@ -115,6 +121,10 @@ When you cannot run evals, check triggering by hand in a fresh session with the 
 | "Continue from the handoff file." | handoff (resume) |
 | "Set this repo up for the workflow." | kickoff |
 | "What does HTTP 409 mean?" | none |
+| "I have an idea for an app for dog walkers. Help me spec it." | discover |
+| "Keep going and build all of milestone 1." | autopilot |
+| "Where are we? Anything you need from me?" | overview |
+| "The screens look generic; make them professional." | design-ui |
 | "Fix the typo 'teh' in README.md." | none |
 
 Also check with each model you plan to use. A description that triggers reliably on a large model may need
