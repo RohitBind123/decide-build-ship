@@ -35,6 +35,11 @@ XML_TAG_PATTERN = re.compile(r"<[A-Za-z/][^>]*>")
 USAGE_PATTERN = re.compile(r"\bUse (when|at|after|before|whenever)\b")
 PLACEHOLDER_PATTERN = re.compile(r"<COPYRIGHT HOLDER>|<github-user>|<repo>")
 GRADER_TYPES = {"regex", "tool_used", "tool_order", "file_exists", "llm", "baseline"}
+# Plugin agents: model aliases Claude Code accepts, and frontmatter keys it ignores for plugin agents.
+AGENT_MODELS = {"haiku", "sonnet", "opus", "fable", "inherit"}
+MODEL_ID_PATTERN = re.compile(r"^claude-[\w.-]+$")
+PLUGIN_AGENT_IGNORED_KEYS = {"hooks", "mcpServers", "permissionMode"}
+PLUGIN_SCRIPT_PATTERN = re.compile(r"\$\{CLAUDE_PLUGIN_ROOT\}/([\w./-]+)")
 
 
 def parse_frontmatter(text: str) -> tuple[dict[str, str], list[str]] | None:
@@ -163,6 +168,76 @@ def check_evals(root: Path, skill_names: list[str], errors: list[str]) -> int:
     return cases
 
 
+def check_agents(root: Path, errors: list[str]) -> int:
+    """Plugin agents: frontmatter with a matching name, a description that says when to use them, a known model."""
+    agents_dir = root / "agents"
+    if not agents_dir.is_dir():
+        return 0
+    agent_files = sorted(agents_dir.glob("*.md"))
+    for agent in agent_files:
+        parsed = parse_frontmatter(agent.read_text(encoding="utf-8"))
+        if parsed is None:
+            errors.append(f"{agent}: frontmatter must start on line 1 and close with ---")
+            continue
+        fields, body = parsed
+        if fields.get("name") != agent.stem:
+            errors.append(f"{agent}: name '{fields.get('name')}' must match the file name '{agent.stem}'")
+        description = fields.get("description", "")
+        if not description or not USAGE_PATTERN.search(description):
+            errors.append(f"{agent}: description is required and should say when to use the agent")
+        model = fields.get("model")
+        if model and model not in AGENT_MODELS and not MODEL_ID_PATTERN.match(model):
+            errors.append(f"{agent}: model '{model}' should be one of {sorted(AGENT_MODELS)} or a full model id")
+        isolation = fields.get("isolation")
+        if isolation and isolation != "worktree":
+            errors.append(f"{agent}: isolation '{isolation}' is not supported; the only value is 'worktree'")
+        if "tools" in fields and not [t for t in fields["tools"].split(",") if t.strip()]:
+            errors.append(f"{agent}: tools is present but empty; remove it or list the tools")
+        ignored = set(fields) & PLUGIN_AGENT_IGNORED_KEYS
+        if ignored:
+            errors.append(f"{agent}: plugin agents ignore {sorted(ignored)}; move them to hooks/ or .mcp.json")
+        if not any(line.strip() for line in body):
+            errors.append(f"{agent}: the body (the agent's instructions) is empty")
+    return len(agent_files)
+
+
+def check_hooks(root: Path, errors: list[str]) -> int:
+    """hooks/hooks.json parses, and every script it runs from the plugin exists."""
+    hooks_file = root / "hooks" / "hooks.json"
+    if not hooks_file.is_file():
+        return 0
+    try:
+        config = json.loads(hooks_file.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        errors.append(f"{hooks_file}: invalid JSON: {exc}")
+        return 0
+    events = config.get("hooks")
+    if not isinstance(events, dict):
+        errors.append(f"{hooks_file}: needs a top-level 'hooks' object")
+        return 0
+    count = 0
+    for event, groups in events.items():
+        if not isinstance(groups, list):
+            errors.append(f"{hooks_file}: {event} must be a list of matcher groups")
+            continue
+        for group in groups:
+            hooks = group.get("hooks") if isinstance(group, dict) else None
+            if not isinstance(hooks, list):
+                errors.append(f"{hooks_file}: each {event} group needs a 'hooks' list")
+                continue
+            for hook in hooks:
+                if not isinstance(hook, dict):
+                    errors.append(f"{hooks_file}: {event} has a hook that is not an object")
+                    continue
+                count += 1
+                for script in PLUGIN_SCRIPT_PATTERN.findall(str(hook.get("command", ""))):
+                    if ".." in Path(script).parts:
+                        errors.append(f"{hooks_file}: {event} script path leaves the plugin: {script}")
+                    elif not (root / script).is_file():
+                        errors.append(f"{hooks_file}: {event} runs a missing script: {script}")
+    return count
+
+
 def find_placeholders(root: Path) -> list[str]:
     """Placeholders the maintainer must fill before publishing (reported, not failed)."""
     found = []
@@ -185,12 +260,16 @@ def main() -> int:
         check_skill(skill_dir, errors, report)
     check_manifests(root, errors)
     cases = check_evals(root, [d.name for d in skill_dirs], errors)
+    agents = check_agents(root, errors)
+    hooks = check_hooks(root, errors)
     for doc in [root / "README.md", *sorted((root / "docs").glob("*.md"))]:
         if doc.is_file():
             check_links(doc, doc.read_text(encoding="utf-8"), errors)
 
     print(f"Skills ({len(skill_dirs)}):")
     print("\n".join(report))
+    print(f"Agents: {agents}")
+    print(f"Hooks: {hooks}")
     print(f"Eval cases: {cases}")
     placeholders = find_placeholders(root)
     if placeholders:
