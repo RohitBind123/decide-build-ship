@@ -1,19 +1,16 @@
 <p align="center">
-  <img src="docs/assets/banner.svg" alt="Decide, Build, Ship: talk to Claude about your product; it writes the spec, asks what only you can decide, and builds it to production grade." width="100%">
+  <img src="https://cdn.jsdelivr.net/npm/@rohit_1/decide-build-ship@latest/docs/assets/banner.svg" alt="Decide, Build, Ship: talk to Claude about your product; it writes the spec, asks what only you can decide, and builds it to production grade." width="100%">
 </p>
 
 <p align="center">
-  <a href="https://github.com/RohitBind123/decide-build-ship/actions/workflows/check.yml"><img src="https://img.shields.io/github/actions/workflow/status/RohitBind123/decide-build-ship/check.yml?branch=main&label=checks" alt="Checks"></a>
-  <a href=".claude-plugin/plugin.json"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FRohitBind123%2Fdecide-build-ship%2Fmain%2F.claude-plugin%2Fplugin.json&query=%24.version&label=version&color=blue" alt="Version"></a>
-  <a href="https://www.npmjs.com/package/@rohit_1/decide-build-ship"><img src="https://img.shields.io/npm/v/@rohit_1/decide-build-ship?label=npm" alt="npm"></a>
+  <a href="https://www.npmjs.com/package/@rohit_1/decide-build-ship"><img src="https://img.shields.io/npm/v/@rohit_1/decide-build-ship?label=npm&color=cb3837" alt="npm version"></a>
   <a href="https://www.npmjs.com/package/@rohit_1/decide-build-ship"><img src="https://img.shields.io/npm/dm/@rohit_1/decide-build-ship?label=downloads" alt="npm downloads"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/RohitBind123/decide-build-ship" alt="License: MIT"></a>
+  <a href="https://cdn.jsdelivr.net/npm/@rohit_1/decide-build-ship@latest/LICENSE"><img src="https://img.shields.io/npm/l/@rohit_1/decide-build-ship" alt="License: MIT"></a>
+  <img src="https://img.shields.io/node/v/@rohit_1/decide-build-ship" alt="Node version">
   <a href="https://code.claude.com/docs/en/plugins"><img src="https://img.shields.io/badge/Claude%20Code-plugin-d97757" alt="Claude Code plugin"></a>
   <img src="https://img.shields.io/badge/skills-11-informational" alt="11 skills">
   <img src="https://img.shields.io/badge/agents-5-informational" alt="5 agents">
-  <a href="https://github.com/RohitBind123/decide-build-ship/stargazers"><img src="https://img.shields.io/github/stars/RohitBind123/decide-build-ship?style=flat" alt="GitHub stars"></a>
-  <a href="https://github.com/RohitBind123/decide-build-ship/commits/main"><img src="https://img.shields.io/github/last-commit/RohitBind123/decide-build-ship" alt="Last commit"></a>
-  <img src="https://hits.sh/github.com/RohitBind123/decide-build-ship.svg?label=views&color=6366f1" alt="Repository views">
+  <img src="https://hits.sh/npmjs.com/package/@rohit_1/decide-build-ship.svg?label=views&color=6366f1" alt="Page views">
 </p>
 
 # Decide, Build, Ship
@@ -28,12 +25,15 @@ assumes no stack, language, hosting or country.
 
 ## Quickstart
 
-```text
-/plugin marketplace add RohitBind123/decide-build-ship
-/plugin install decide-build-ship@decide-build-ship
+As a Claude Code plugin (skills, agents and the resume hook):
+
+```bash
+npx @rohit_1/decide-build-ship plugin     # copies the plugin to ~/.decide-build-ship/plugin
+claude plugin marketplace add ~/.decide-build-ship/plugin
+claude plugin install decide-build-ship@decide-build-ship
 ```
 
-Or, without the plugin system, copy the skills and agents into your project with npm:
+Or copy just the skills and agents into your project:
 
 ```bash
 npx @rohit_1/decide-build-ship install          # into ./.claude
@@ -148,7 +148,7 @@ Loafly is a fictional pre-order app for one bakery. Riley owns the bakery and de
 3. **Decide.** Open points go through `decide`. When Riley suggests "let the assistant answer allergen
    questions from general knowledge", it pushes back: a confident wrong answer about nuts could harm a customer.
    It recommends answering only from the bakery's ingredient sheets. Riley agrees; the answer is logged in
-   Riley's words ([example log](docs/example-decisions-log.md)).
+   Riley's words ([example log](https://cdn.jsdelivr.net/npm/@rohit_1/decide-build-ship@latest/docs/example-decisions-log.md)).
 4. **Autopilot.** Riley says "Build M1 and merge what passes." `autopilot` asks for a merge approval covering
    M1 and records it. It then plans each slice, has `design-ui` write the design system before the first
    screen, runs builders in worktrees, verifies each slice with the gate, reviews and a live check, and merges.
@@ -159,73 +159,65 @@ Loafly is a fictional pre-order app for one bakery. Riley owns the bakery and de
 
 ## Install
 
+Everything installs from npm; you need Node.js 18 or later and Claude Code.
+
 ### As a plugin (recommended)
 
-```text
-/plugin marketplace add RohitBind123/decide-build-ship
-/plugin install decide-build-ship@decide-build-ship
-```
-
-Or from a shell:
-
 ```bash
-claude plugin marketplace add RohitBind123/decide-build-ship
+npx @rohit_1/decide-build-ship plugin
+claude plugin marketplace add ~/.decide-build-ship/plugin
 claude plugin install decide-build-ship@decide-build-ship
 ```
+
+The first command copies the full plugin to `~/.decide-build-ship/plugin`; Claude Code loads it from there. You
+can also run the last two steps inside Claude Code as `/plugin marketplace add ~/.decide-build-ship/plugin` and
+`/plugin install decide-build-ship@decide-build-ship`.
+
+To update later, run `npx @rohit_1/decide-build-ship@latest plugin` again, then
+`claude plugin marketplace update decide-build-ship` and `claude plugin update decide-build-ship@decide-build-ship`.
 
 Plugin skills are namespaced: `/decide-build-ship:discover`, `/decide-build-ship:autopilot` and so on. The
 plugin also installs the agents and the SessionStart hook.
 
-### With npm
+### Skills and agents only
 
 ```bash
 npx @rohit_1/decide-build-ship install            # skills and agents into ./.claude
 npx @rohit_1/decide-build-ship install --user     # into ~/.claude
 npx @rohit_1/decide-build-ship install --dry-run  # show what would be copied
 npx @rohit_1/decide-build-ship list               # what is included
-npx @rohit_1/decide-build-ship plugin             # the plugin install commands
 ```
 
-It never overwrites a skill or agent you already have with the same name. The SessionStart hook comes only with
-the plugin install.
+It never overwrites a skill or agent you already have with the same name. Copied skills run as `/decide`,
+`/discover` and so on. The SessionStart hook comes only with the plugin install.
 
-### As plain skill folders
-
-```bash
-git clone https://github.com/RohitBind123/decide-build-ship.git
-cp -R decide-build-ship/skills/* your-project/.claude/skills/     # this project only
-cp -R decide-build-ship/skills/* ~/.claude/skills/                # all your projects
-cp decide-build-ship/agents/*.md your-project/.claude/agents/     # optional: the agents
-```
-
-Copy all the skills together: `kickoff` and `discover` read templates from their sibling skills. The hook is
-available only through the plugin.
-
-### Try it without installing
+### Try it for one session
 
 ```bash
-git clone https://github.com/RohitBind123/decide-build-ship.git
-claude --plugin-dir ./decide-build-ship
+npx @rohit_1/decide-build-ship plugin
+claude --plugin-dir ~/.decide-build-ship/plugin
 ```
 
 ### Recommended companions
 
 Platform depth comes from companion projects with their own licences: Apple HIG review, the official
 `frontend-design` plugin, Modern Web Guidance for current web platform features, Playwright for live checks.
-See [docs/companion-skills.md](docs/companion-skills.md).
+See [docs/companion-skills.md](https://cdn.jsdelivr.net/npm/@rohit_1/decide-build-ship@latest/docs/companion-skills.md).
 
 ## Documentation
 
 | Doc | What it covers |
 |---|---|
-| [Working with Claude efficiently](docs/working-with-claude.md) | What to say, the Claude Code features the skills use, unattended runs, cost |
-| [Configuration](docs/configuration.md) | Every key of the `Build workflow` section and its default |
-| [Companion skills](docs/companion-skills.md) | Design, testing and security companions and how to install them |
-| [Testing](docs/testing.md) | The lint, the plugin validator and the behavioural evals |
-| [Research notes](docs/research-notes.md) | The official guidance behind the design, with sources |
-| [Example decisions log](docs/example-decisions-log.md) | A filled log for the Loafly example |
+| [Working with Claude efficiently](https://cdn.jsdelivr.net/npm/@rohit_1/decide-build-ship@latest/docs/working-with-claude.md) | What to say, the Claude Code features the skills use, unattended runs, cost |
+| [Configuration](https://cdn.jsdelivr.net/npm/@rohit_1/decide-build-ship@latest/docs/configuration.md) | Every key of the `Build workflow` section and its default |
+| [Companion skills](https://cdn.jsdelivr.net/npm/@rohit_1/decide-build-ship@latest/docs/companion-skills.md) | Design, testing and security companions and how to install them |
+| [Testing](https://cdn.jsdelivr.net/npm/@rohit_1/decide-build-ship@latest/docs/testing.md) | The lint, the plugin validator and the behavioural evals |
+| [Research notes](https://cdn.jsdelivr.net/npm/@rohit_1/decide-build-ship@latest/docs/research-notes.md) | The official guidance behind the design, with sources |
+| [Example decisions log](https://cdn.jsdelivr.net/npm/@rohit_1/decide-build-ship@latest/docs/example-decisions-log.md) | A filled log for the Loafly example |
 
 ## Testing
+
+For maintainers, in the source repository:
 
 ```bash
 python3 scripts/check_skills.py                                   # structural lint, free
@@ -245,10 +237,10 @@ claude plugin eval . --allow-tools Write --no-publish             # behavioural 
   plugin, as copied skills, and in other tools that read the Agent Skills format.
 - **Never trade quality for speed**, including in long or unattended runs.
 
-## Contributing
+## Feedback
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Changes are recorded in [CHANGELOG.md](CHANGELOG.md).
+Changes are recorded in the [changelog](https://cdn.jsdelivr.net/npm/@rohit_1/decide-build-ship@latest/CHANGELOG.md). Feedback and bug reports: rohit@staquest.com.
 
 ## License
 
-MIT. See [LICENSE](LICENSE). Companion projects keep their own licences.
+MIT. See [LICENSE](https://cdn.jsdelivr.net/npm/@rohit_1/decide-build-ship@latest/LICENSE). Companion projects keep their own licences.

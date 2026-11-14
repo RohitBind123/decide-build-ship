@@ -1,6 +1,6 @@
 {
   "name": "@rohit_1/decide-build-ship",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A decision-first product workflow for Claude Code: discover, decide, plan, design, build, verify, ship, autopilot, overview and handoff skills, plus review agents. Installs into .claude with one command.",
   "keywords": [
     "claude",
@@ -14,13 +14,9 @@
     "tdd",
     "autonomous"
   ],
-  "homepage": "https://github.com/RohitBind123/decide-build-ship#readme",
+  "homepage": "https://www.npmjs.com/package/@rohit_1/decide-build-ship",
   "bugs": {
-    "url": "https://github.com/RohitBind123/decide-build-ship/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RohitBind123/decide-build-ship.git"
+    "email": "rohit@staquest.com"
   },
   "license": "MIT",
   "author": "RohitBind123 (https://github.com/RohitBind123)",
