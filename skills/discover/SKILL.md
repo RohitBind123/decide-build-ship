@@ -34,6 +34,8 @@ Discover progress:
 
 ## 1. Frame the idea
 
+Tell the owner the plan in two lines: research, short interview rounds, then the documents you will write (the
+product brief, the architecture and a roadmap of milestones, plus a design system when there are screens).
 Restate the idea in one sentence and confirm it. Settle the frame first, because it decides everything else:
 product type (web, mobile, desktop, backend, AI or agent, several), stage (prototype, MVP, production product,
 rebuild), who decides, the deadline and budget if there is one, and the one job a first user must be able to do.
@@ -41,7 +43,8 @@ rebuild), who decides, the deadline and budget if there is one, and the one job 
 ## 2. Research the domain
 
 Delegate research to a read-only research sub-agent (the `product-researcher` agent when this pack is installed
-as a plugin) and keep only its brief. Follow [references/research.md](references/research.md):
+as a plugin) and keep only its brief. Wait for the brief before the first interview round (run the agent in the
+foreground), so every recommendation can use it. Follow [references/research.md](references/research.md):
 
 - how people solve the problem today, and the three to five closest products;
 - the table-stakes features every serious product in the space has, and where they fall short;
