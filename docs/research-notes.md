@@ -15,6 +15,13 @@ Claude Code v2.1.322 in November 2026. Re-check the sources before relying on a 
 8. Anthropic's example skills and marketplace: https://github.com/anthropics/skills (including
    `skills/skill-creator/SKILL.md` and `.claude-plugin/marketplace.json`)
 9. Coding-mistake guidelines referenced in `build-slice`: https://github.com/multica-ai/andrej-karpathy-skills
+10. Sub-agents (plugin agent frontmatter): https://code.claude.com/docs/en/sub-agents.md
+11. Hooks (SessionStart context): https://code.claude.com/docs/en/hooks.md
+12. Scheduled tasks and /loop: https://code.claude.com/docs/en/scheduled-tasks.md
+13. Worktrees: https://code.claude.com/docs/en/worktrees.md
+14. Permission modes (auto mode): https://code.claude.com/docs/en/permission-modes.md
+15. WCAG 2.2: https://www.w3.org/TR/WCAG22/
+16. Modern Web Guidance, a reference for how a guidance pack is structured: https://github.com/GoogleChrome/modern-web-guidance-src
 
 ## SKILL.md format
 
@@ -101,3 +108,28 @@ projects are included. The lessons kept are:
 - a handoff file kept current, because limits and restarts arrive without warning;
 - for AI products: evals before prompts, pinned models, budgets for cost and latency, capability decided by
   code rather than by content, and people approving consequential actions.
+
+## Agents and hooks (added in 0.2.0)
+
+- Plugin agents live in `agents/*.md` with `name` and `description` required; `tools`, `model`, `effort`,
+  `isolation: worktree` and others are optional. For plugin agents, `hooks`, `mcpServers` and `permissionMode`
+  are ignored, so this pack keeps hooks in `hooks/hooks.json` and ships no MCP server (10, 4).
+- Plugin hooks live in `hooks/hooks.json` under a top-level `hooks` object. A SessionStart hook adds context by
+  printing to stdout with exit code 0; it runs again on resume and after compaction. Output should be factual
+  statements, not imperative instructions, and short (10).
+- `${CLAUDE_PLUGIN_ROOT}` points at the installed plugin and changes on update; nothing is written there (4).
+- The plugin directory asks for a square PNG icon of 512 to 2048 px at `.claude-plugin/icon.png`.
+
+## Autonomy (added in 0.2.0)
+
+- `/loop` runs while the session is open and idle; without an interval Claude paces itself. Cloud scheduled
+  runs start from a fresh clone, so the workflow's state must be committed and pushed for them to continue (12).
+- Auto mode reviews each action with a classifier; it reduces prompts but is not a safety guarantee (14). The
+  `autopilot` skill therefore keeps the owner approvals in `CLAUDE.md` and the decisions log as the source of
+  truth, whatever the permission mode.
+
+## Design guidance (added in 0.2.0)
+
+- `design-ui` is original text. It cites platform guidelines (Apple HIG, Material 3, Fluent, WCAG) by link
+  instead of copying them, so the pack stays MIT-licensed. Platform depth comes from companion skills that keep
+  their own licences (`docs/companion-skills.md`).

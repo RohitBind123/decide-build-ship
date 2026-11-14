@@ -9,15 +9,17 @@ it by hand. When a key is missing, a skill uses the default below and says so on
 
 | Key | Used by | Default |
 |---|---|---|
-| Product type | plan-slice, verify-slice | Asked during kickoff |
+| Product type | discover, plan-slice, design-ui, verify-slice | Asked during kickoff |
 | Product facts | decide | None |
 | Review perspectives | decide | All lenses in `skills/decide/references/perspectives.md`; the AI lens only when a model is involved |
-| Spec | decide, plan-slice | `docs/spec/` |
+| Spec | discover, decide, plan-slice | `docs/spec/` |
+| Roadmap | discover, plan-slice, autopilot, overview, ship-slice | `docs/spec/roadmap.md` |
+| Design system | design-ui, plan-slice | `docs/spec/design-system.md` |
 | Decisions log | decide, plan-slice, verify-slice, ship-slice | `docs/decisions.md` |
 | Feature docs | plan-slice | `docs/features/` |
 | ADRs | plan-slice | `docs/adr/` |
 | Evidence | plan-slice, build-slice, verify-slice | `docs/evidence/<slice>/` |
-| Handoff file | handoff | `tasks/handoff.md` |
+| Handoff file | handoff, autopilot, overview, SessionStart hook | `tasks/handoff.md` |
 | Changelog, Backlog | ship-slice | `CHANGELOG.md`, `docs/backlog.md` |
 | Remote | ship-slice, handoff | `origin` |
 | Integration branch, Production branch | plan-slice, ship-slice, handoff | Ask the owner |
@@ -31,8 +33,10 @@ it by hand. When a key is missing, a skill uses the default below and says so on
 | Evals | verify-slice | None until the first AI slice |
 | Release steps | ship-slice | Ask the owner |
 | Models per task | plan-slice, build-slice, verify-slice | Small model for search and docs, mid-size for building and reviews, largest for architecture and security |
-| Reviewers | verify-slice | Code, security, database (migrations), content (user-facing text) |
-| Approvals | ship-slice, handoff | Merge, push of a shared branch, release, new dependency, spending money, deleting data |
+| Reviewers | verify-slice | Code, security, database (migrations), content (user-facing text), design (screens) |
+| Approvals | ship-slice, handoff, autopilot | Merge, push of a shared branch, release, new dependency, spending money, deleting data |
+| Autonomy | autopilot | `milestone`: merges approved once per milestone; releases, money, new dependencies and deleting data always ask |
+| Max parallel slices | autopilot | 2 |
 | Coverage target | build-slice | 80% of new code |
 | File size cap | plan-slice, build-slice | None |
 | Commit rules | build-slice | Conventional commits, explicit paths only |
