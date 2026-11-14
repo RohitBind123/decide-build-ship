@@ -48,8 +48,9 @@ AskUserQuestion tool: "Approve merge" (recommended when everything above holds) 
 
 - The tool is denied, unavailable or unanswered: that is not an approval. Ask in plain text and stop until the
   owner answers.
-- A standing approval can replace the question only if the owner's own words are recorded verbatim, with a
-  date, in the decisions log, and only within its written conditions. Say which one you rely on. Never write a
+- A standing approval can replace the question only if the owner's own words (or the full question and the
+  option they chose) are recorded verbatim, with a date and conditions, in the decisions log, and only within
+  those conditions. Say which one you rely on. Never write a
   standing approval yourself from an inference.
 
 ## 3. Merge the project's way
@@ -69,9 +70,11 @@ The production branch moves only on a release the owner approves. Release steps,
 
 ## 5. After the merge
 
-1. Set the ADR to Accepted and the feature doc to Shipped; add the changelog entry.
+1. Set the ADR to Accepted and the feature doc to Shipped; mark the slice merged in the roadmap; add the
+   changelog entry.
 2. Move deferred items, owner actions and blockers to the backlog, each with its source.
 3. Update the handoff file's "next step" to the next slice (`handoff` skill).
 4. Remove this slice's worktrees and local branches (see the release reference); keep any whose agent is still
    running.
-5. Ask the owner before starting the next slice.
+5. Ask the owner before starting the next slice, unless `autopilot` is running the milestone under a recorded
+   standing approval.

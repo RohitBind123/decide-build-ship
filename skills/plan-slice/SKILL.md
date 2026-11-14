@@ -33,7 +33,8 @@ Plan progress:
 
 ## 1. Research
 
-1. Read the spec sections the work touches and every related entry in the decisions log.
+1. Read the spec sections the work touches, every related entry in the decisions log, and the roadmap (default
+   `docs/spec/roadmap.md`) when one exists: slices come from it, and a new slice is added to it.
 2. Map the existing code with a read-only search agent on the cheapest suitable model: it returns a file:line
    report of what exists, what to reuse and what to avoid. It must not edit files or read secrets.
 3. Look for an existing pattern or library before planning new code.
@@ -61,7 +62,8 @@ names for planning, then review it yourself. The plan covers:
    ([references/ai-slices.md](references/ai-slices.md)).
 5. **Contract**: the API, event, schema or prompt and tool interfaces the slice adds, defined before code.
 6. **Screens**: every screen an admin or user needs to manage what the slice adds. If one is not in this
-   slice, name the slice that delivers it and raise it with the owner.
+   slice, name the slice that delivers it and raise it with the owner. List every state of each screen and
+   follow the design system (`design-ui` skill); a product without one gets it before its first screen.
 7. **File list**: new and changed files, grouped into file sets with exactly one builder each; keep every file
    under the project's size cap.
 8. **Evidence plan**: the BEFORE state to capture now and the AFTER state to capture when done.

@@ -42,7 +42,8 @@ Decide progress:
 1. Read the spec sections that the work touches, and the decisions log for earlier answers.
 2. The spec is the floor: build to it or better. How an older version of the product behaves is not a
    constraint and not a reason to ask.
-3. No spec yet: write a one-page spec with the owner before planning. Follow
+3. No spec yet for a new product, an MVP or a large feature: run `discover`, which researches the domain and
+   writes the full spec suite. For a small feature, write a one-page spec here with the owner. Follow
    [references/writing-a-spec.md](references/writing-a-spec.md) and the template
    [assets/spec-template.md](assets/spec-template.md). Get the owner's approval of the page.
 4. Sort every open point:

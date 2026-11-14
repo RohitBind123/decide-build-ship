@@ -49,7 +49,11 @@ Run reviewers at the same time, each briefed with the diff and the feature doc, 
 - a security reviewer (the strongest configured model) for anything touching input, auth, data access,
   secrets or money;
 - a database reviewer when the slice adds migrations or heavy queries;
-- a content reviewer for user-facing text and data display (missing values as 0, raw codes on screen).
+- a content reviewer for user-facing text and data display (missing values as 0, raw codes on screen);
+- a design reviewer for new or changed screens, working from the live-check screenshots (`design-ui` skill).
+
+When this pack is installed as a plugin, its `code-reviewer`, `security-reviewer` and `design-reviewer` agents
+fit these roles; the project's own reviewers, named in `Reviewers`, take precedence.
 
 Fix every critical, high and medium finding, each with a failing test first; fix low findings when cheap. A
 finding outside the slice goes to the owner as a decision (`decide`), not into this slice silently. Log

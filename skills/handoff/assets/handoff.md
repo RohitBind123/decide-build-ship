@@ -9,8 +9,9 @@ Continue <project> at <repository path>. Read CLAUDE.md (section "Build workflow
 (<handoff path>) first, then check the state with: git status; git log -1; git worktree list.
 We are on branch <branch> at <sha>, in the <decide | plan | build | verify | ship> phase of <slice>.
 Next step: <one concrete action>.
-Use the skills decide, plan-slice, build-slice, verify-slice, ship-slice and handoff.
-Ask the owner with AskUserQuestion before any merge, push or release.
+Use the skills discover, decide, plan-slice, design-ui, build-slice, verify-slice, ship-slice, autopilot,
+overview and handoff. Autopilot running: <yes, milestone M | no>.
+Ask the owner with AskUserQuestion before any merge, push or release not covered by a recorded standing approval.
 ```
 
 ## Where things stand
@@ -19,6 +20,7 @@ Ask the owner with AskUserQuestion before any merge, push or release.
 - Branch: <branch> at <sha>; working tree: clean | <uncommitted files>
 - Pushed: yes | no (<what is local only>)
 - Phase: <phase>
+- Milestone: <M> (<n> of <total> slices merged; roadmap <path>)
 
 ## Done
 
