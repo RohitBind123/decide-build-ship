@@ -2,7 +2,8 @@
   "name": "decide-build-ship",
   "description": "Skills for building a product end to end with Claude, from spec and decisions to a verified, approved release.",
   "owner": {
-    "name": "<COPYRIGHT HOLDER>"
+    "name": "RohitBind123",
+    "email": "rohit@staquest.com"
   },
   "plugins": [
     {

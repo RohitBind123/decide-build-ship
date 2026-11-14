@@ -58,14 +58,14 @@ nothing is decided silently in code.
 In Claude Code:
 
 ```text
-/plugin marketplace add <github-user>/<repo>
+/plugin marketplace add RohitBind123/decide-build-ship
 /plugin install decide-build-ship@decide-build-ship
 ```
 
 Or from a shell:
 
 ```bash
-claude plugin marketplace add <github-user>/<repo>
+claude plugin marketplace add RohitBind123/decide-build-ship
 claude plugin install decide-build-ship@decide-build-ship
 ```
 
@@ -77,9 +77,9 @@ on, or just describe what you want and Claude picks the skill.
 Copy the folders into a project (shared with everyone who clones it) or into your personal skills:
 
 ```bash
-git clone https://github.com/<github-user>/<repo>.git
-cp -R <repo>/skills/* your-project/.claude/skills/     # this project only
-cp -R <repo>/skills/* ~/.claude/skills/                # all your projects
+git clone https://github.com/RohitBind123/decide-build-ship.git
+cp -R decide-build-ship/skills/* your-project/.claude/skills/     # this project only
+cp -R decide-build-ship/skills/* ~/.claude/skills/                # all your projects
 ```
 
 Copied skills run as `/decide`, `/plan-slice` and so on. Copy all seven together: `kickoff` reads its
@@ -88,8 +88,8 @@ templates from the sibling skills. If you already have a personal skill with the
 ### Try it without installing
 
 ```bash
-git clone https://github.com/<github-user>/<repo>.git
-claude --plugin-dir ./<repo>
+git clone https://github.com/RohitBind123/decide-build-ship.git
+claude --plugin-dir ./decide-build-ship
 ```
 
 ## A five-minute walkthrough

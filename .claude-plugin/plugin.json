@@ -4,8 +4,12 @@
   "version": "0.1.0",
   "description": "A decision-first workflow for building a product end to end with Claude: settle decisions against the spec and review the owner's answers before building, then plan thin slices, build with TDD and parallel agents, verify with a changed-only gate and a live check, ship only when green and approved, and hand off safely across sessions.",
   "author": {
-    "name": "<COPYRIGHT HOLDER>"
+    "name": "RohitBind123",
+    "email": "rohit@staquest.com",
+    "url": "https://github.com/RohitBind123"
   },
+  "homepage": "https://github.com/RohitBind123/decide-build-ship",
+  "repository": "https://github.com/RohitBind123/decide-build-ship",
   "license": "MIT",
   "keywords": [
     "workflow",
