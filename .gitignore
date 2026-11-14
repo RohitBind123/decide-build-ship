@@ -1,0 +1,7 @@
+# Eval run output (reports, transcripts, recordings)
+evals/results/
+
+# Editor and OS files
+.DS_Store
+*.swp
+__pycache__/

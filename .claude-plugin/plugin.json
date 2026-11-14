@@ -1,0 +1,20 @@
+{
+  "name": "decide-build-ship",
+  "displayName": "Decide, Build, Ship",
+  "version": "0.1.0",
+  "description": "A decision-first workflow for building a product end to end with Claude: settle decisions against the spec and review the owner's answers before building, then plan thin slices, build with TDD and parallel agents, verify with a changed-only gate and a live check, ship only when green and approved, and hand off safely across sessions.",
+  "author": {
+    "name": "<COPYRIGHT HOLDER>"
+  },
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "decisions",
+    "planning",
+    "tdd",
+    "verification",
+    "release",
+    "handoff",
+    "ai-products"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "decide-build-ship",
+  "description": "Skills for building a product end to end with Claude, from spec and decisions to a verified, approved release.",
+  "owner": {
+    "name": "<COPYRIGHT HOLDER>"
+  },
+  "plugins": [
+    {
+      "name": "decide-build-ship",
+      "source": "./",
+      "description": "Decide, plan, build, verify, ship and hand off: a decision-first build workflow for web and mobile apps, backends, AI and agent products, and startup MVPs.",
+      "category": "development",
+      "tags": [
+        "workflow",
+        "decisions",
+        "tdd",
+        "verification",
+        "release"
+      ]
+    }
+  ]
+}
