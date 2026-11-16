@@ -31,13 +31,19 @@
     "hooks/",
     ".claude-plugin/",
     "docs/",
+    "!docs/decisions.md",
+    "!docs/spec/",
+    "!docs/features/",
+    "!docs/adr/",
+    "!docs/evidence/",
+    "!docs/backlog.md",
     "CHANGELOG.md"
   ],
   "engines": {
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test cli/index.test.mjs cli/cleanup-slice.test.mjs cli/session-start.test.mjs && python3 scripts/check_skills.py",
+    "test": "node --test cli/index.test.mjs cli/cleanup-slice.test.mjs cli/package.test.mjs cli/session-start.test.mjs && python3 scripts/check_skills.py",
     "prepublishOnly": "npm test"
   },
   "publishConfig": {

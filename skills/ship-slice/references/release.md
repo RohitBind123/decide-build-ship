@@ -80,14 +80,14 @@ out in the main checkout), `--abandon <branch>` (also remove an unmerged slice t
 `--stop-procs` (stop dev servers and browsers running inside a worktree before removing it).
 
 It removes a linked worktree (and its `node_modules`, build output and caches) and its local branch only when
-the branch is merged into the base, the worktree has no uncommitted work, it is not locked and no process runs
-inside it. It keeps everything else and says why. It also deletes merged local branches that no worktree uses,
+the branch is merged into the base, the worktree has no uncommitted work, it holds no ignored secret-like files
+(`.env*`, `*.pem`, `*.key`, `*.sqlite`, `*.db`), it is not locked and no process runs inside it. It keeps everything else and says why. It also deletes merged local branches that no worktree uses,
 and prunes worktree records whose folder is gone. It never deletes a remote branch: it prints the command, and
 you run it only with the owner's approval.
 
 By hand, when the script is unavailable: `git worktree list`, `git worktree remove <path>`,
 `git branch -d <branch>` (`-D` only for an abandoned branch you own), `git worktree prune`.
 
-Keep any worktree whose agent is still running. Never remove another session's worktree or branch. A slice that
-was squash-merged is not an ancestor of the base, so the script keeps it; confirm the merge, then pass
-`--abandon <branch>`.
+Keep any worktree whose agent is still running. Never remove another session's worktree or branch. The script detects
+squash merges offline (it checks that merging the branch into the base would change nothing), so it removes
+them without help. Pass `--abandon <branch>` only when a slice is not detected as merged and the owner dropped it.
