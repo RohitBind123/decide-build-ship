@@ -1,6 +1,6 @@
 {
   "name": "@rohit_1/decide-build-ship",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "A decision-first product workflow for Claude Code: discover, decide, plan, design, build, verify, ship, autopilot, overview and handoff skills, plus review agents. Installs into .claude with one command.",
   "keywords": [
     "claude",
