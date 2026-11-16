@@ -61,6 +61,9 @@ not in the skills.
 - Always ask the owner (with AskUserQuestion) before: merging, pushing a shared branch, releasing, adding a
   dependency, spending money, deleting data.
 - Standing approvals: see the "Standing approvals" section of the decisions log.
+- Cleanup: <ask | auto | off>. After a merge, `ask` shows what would be removed (merged worktrees, build output,
+  merged local branches) and asks; `auto` removes it; `off` leaves it. The session-start report is silent on `off`.
+- Cleanup stop procs: <no | yes>. `yes` lets cleanup stop dev servers running inside a merged worktree.
 - Autonomy: <milestone | per merge>. `milestone`: autopilot merges verified slices under a merge approval the
   owner gives once per milestone. Releases, money, new dependencies and deleting data always ask.
 

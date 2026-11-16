@@ -82,7 +82,7 @@ start at the code. This one starts at the decisions:
 | `design-ui` | Writes the design system, designs every screen state, applies accessibility and platform conventions, reviews screenshots | have screens to design or say "it looks generic" |
 | `build-slice` | Docs before code, contract first, failing test first, parallel builders in worktrees, one writer per file set | say "build it" |
 | `verify-slice` | Changed-only gate, parallel code, security and design reviews, a live check of the real app, AI evals, evidence | ask "is it done?" |
-| `ship-slice` | Merges only when green and approved, never force-pushes shared branches, runs releases and the tidy-up | say "merge", "ship" or "release" |
+| `ship-slice` | Merges only when green and approved, never force-pushes shared branches, runs releases and cleans up merged worktrees, build output and branches (setting: `Cleanup`) | say "merge", "ship" or "release" |
 | `autopilot` | Runs plan, build, verify and ship slice after slice for a milestone, in parallel where safe, stopping only for what needs you | say "keep going" or "build the milestone" |
 | `overview` | A read-only report of progress, running work, blockers and what needs you, from files and git state | ask "where are we?" |
 | `handoff` | Keeps a paste-ready handoff file in the repository and resumes from it | near a limit, before a restart, at each phase change |
@@ -100,7 +100,8 @@ start at the code. This one starts at the decisions:
 ### Hook
 
 A `SessionStart` hook tells every new, resumed or compacted session whether a handoff file exists and what its
-next step is, so work continues where it stopped. It reads only `CLAUDE.md` and the handoff file.
+next step is, so work continues where it stopped. It also reports merged worktrees still on disk (count and size; it never deletes). It reads only `CLAUDE.md`,
+the handoff file and the git worktree list.
 
 ### Templates
 

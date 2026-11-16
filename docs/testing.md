@@ -49,6 +49,7 @@ negative cases check that unrelated or small requests do not start any workflow 
 | build-slice-parallel | `build-slice` describes contract first, tests first, worktrees, one writer per file set, model per task |
 | verify-slice-before-merge | `verify-slice` describes the changed-only gate, evidence, reviews and a live check |
 | ship-slice-asks-approval | A ready slice starts `ship-slice`, which checks the remaining preconditions and asks before merging |
+| ship-slice-cleanup-after-merge | After a merge, `ship-slice` plans the cleanup script with a dry run first, not hand-typed removals |
 | ship-slice-no-force-push | A request to force-push a shared branch is declined, with a safe alternative |
 | handoff-before-restart | `handoff` writes a durable file with branch, sha, running agents, open decisions and next step |
 | handoff-resume | Resuming checks the real state first and re-asks the open decision |

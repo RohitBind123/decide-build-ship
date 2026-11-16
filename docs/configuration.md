@@ -37,6 +37,8 @@ it by hand. When a key is missing, a skill uses the default below and says so on
 | Approvals | ship-slice, handoff, autopilot | Merge, push of a shared branch, release, new dependency, spending money, deleting data |
 | Autonomy | autopilot | `milestone`: merges approved once per milestone; releases, money, new dependencies and deleting data always ask |
 | Max parallel slices | autopilot | 2 |
+| Cleanup | ship-slice, autopilot, SessionStart hook | `ask`: show what would be removed, then ask. `auto` removes merged worktrees, their build output and merged local branches after a merge; `off` leaves everything and silences the session-start report |
+| Cleanup stop procs | ship-slice | `no`. `yes` lets cleanup stop processes running inside a merged worktree |
 | Coverage target | build-slice | 80% of new code |
 | File size cap | plan-slice, build-slice | None |
 | Commit rules | build-slice | Conventional commits, explicit paths only |
