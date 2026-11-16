@@ -6,6 +6,9 @@ evals/results/
 *.swp
 __pycache__/
 
+# Dependencies and build output
+node_modules/
+
 # Personal build-workflow files of the maintainer (never commit to this public repo)
 /CLAUDE.md
 /tasks/
