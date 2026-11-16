@@ -20,7 +20,7 @@ Status values: `Proposed` (asked, no answer yet), `Accepted`, `Replaced by D<n>`
 - Asked: 2026-11-16, in M1
 - Spec: docs/spec/spec.md requirement 2 (offline, no owner question)
 - Options offered: A) `git merge-tree --write-tree` equals base tree (offline) (recommended), B) `gh pr view` merged state (needs network and gh)
-- Owner's answer, verbatim: "delegated to Claude" (owner said to cover items 1 to 7 using the skills)
+- Owner's answer, verbatim: "Offline git check (Recommended)"
 - Review: engineering cost - offline check avoids a gh dependency; fall back to keep when git is too old for merge-tree
 - Status: Accepted
 - Replaces: nothing
@@ -42,7 +42,7 @@ Status values: `Proposed` (asked, no answer yet), `Accepted`, `Replaced by D<n>`
 - Asked: 2026-11-16, in M1
 - Spec: requirement 4
 - Options offered: A) ship-slice step 5 and handoff checklist, plus autopilot step (recommended), B) verify-slice
-- Owner's answer, verbatim: "delegated to Claude"
+- Owner's answer, verbatim: "ship-slice, handoff, autopilot (Recommended)"
 - Review: verify-slice runs before merge so a merged slice cannot be checked there; ship-slice and handoff run after.
 - Status: Accepted
 - Replaces: nothing
@@ -53,7 +53,7 @@ Status values: `Proposed` (asked, no answer yet), `Accepted`, `Replaced by D<n>`
 - Asked: 2026-11-16, in M1
 - Spec: requirement 3
 - Options offered: A) report only: count and size of merged worktrees (recommended), B) offer to clean
-- Owner's answer, verbatim: "delegated to Claude"
+- Owner's answer, verbatim: "Report only (Recommended)"
 - Review: the hook runs on every session of every user; it must stay fast and never delete.
 - Status: Accepted
 - Replaces: nothing
