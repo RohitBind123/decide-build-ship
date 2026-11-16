@@ -6,6 +6,11 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- The npm package no longer contains the project's own decisions log, spec, feature docs, ADRs, evidence or
+  backlog; a test checks what `npm pack` would publish.
+
 ### Added
 
 - `skills/ship-slice/scripts/cleanup-slice.sh`: removes merged slice worktrees with their build output,
