@@ -52,7 +52,7 @@ test("merged worktree: report line with count appears", () => {
     const r = run(p);
     assert.match(
       r.out,
-      /1 merged worktree is still on disk \(about \d+ MB\)\. Run the ship-slice cleanup script \(dry run first\)\./,
+      /1 merged worktree is still on disk\. Run the ship-slice cleanup script \(dry run first; it shows sizes\)\./,
     );
     addWorktree(p, "done-b", { merged: true });
     assert.match(run(p).out, /2 merged worktrees are still on disk/);
@@ -122,5 +122,42 @@ test("exit code is 0 for removed worktree folder, non-git dir and missing CLAUDE
     assert.equal(runIn(empty).code, 0);
   } finally {
     for (const d of [p.root, plain, empty]) rmSync(d, { recursive: true, force: true });
+  }
+});
+
+test("a session inside its own unmerged slice worktree does not report itself", () => {
+  const p = makeProject();
+  try {
+    addWorktree(p, "wip", { extraCommit: true });
+    const r = runIn(join(p.root, "wip"));
+    assert.doesNotMatch(r.out, LINE);
+    assert.equal(r.code, 0);
+  } finally {
+    rmSync(p.root, { recursive: true, force: true });
+  }
+});
+
+test("a session in a third worktree counts a merged sibling against the main checkout", () => {
+  const p = makeProject();
+  try {
+    addWorktree(p, "done", { merged: true });
+    addWorktree(p, "mine", { extraCommit: true });
+    const r = runIn(join(p.root, "mine"));
+    assert.match(r.out, /1 merged worktree is still on disk/);
+    assert.doesNotMatch(r.out, /2 merged/);
+  } finally {
+    rmSync(p.root, { recursive: true, force: true });
+  }
+});
+
+test("Cleanup: Off and Cleanup: `off` also silence the report", () => {
+  for (const setting of ["- Cleanup: Off", "- Cleanup: `off`"]) {
+    const p = makeProject({ settings: setting });
+    try {
+      addWorktree(p, "done", { merged: true });
+      assert.doesNotMatch(run(p).out, LINE, setting);
+    } finally {
+      rmSync(p.root, { recursive: true, force: true });
+    }
   }
 });
