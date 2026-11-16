@@ -8,3 +8,13 @@ __pycache__/
 
 # Dependencies and build output
 node_modules/
+
+# Personal build-workflow files of the maintainer (never commit to this public repo)
+/CLAUDE.md
+/tasks/
+/docs/decisions.md
+/docs/spec/
+/docs/features/
+/docs/adr/
+/docs/evidence/
+/docs/backlog.md
