@@ -28,13 +28,14 @@ function repo() {
 }
 
 function slice(dir, name, { commit = true } = {}) {
-  const wt = join(dir, "..", `${name}-wt-${Date.now()}${Math.random().toString(36).slice(2, 6)}`);
+  const wt = join(dir, "..", `${name.replace(/\//g, "-")}-wt-${Date.now()}${Math.random().toString(36).slice(2, 6)}`);
   git(dir, "worktree", "add", "-q", "-b", name, wt);
   mkdirSync(join(wt, "node_modules"), { recursive: true });
   writeFileSync(join(wt, "node_modules", "big.bin"), "x".repeat(2048));
   if (commit) {
-    writeFileSync(join(wt, `${name}.txt`), name);
-    git(wt, "add", `${name}.txt`);
+    const file = `${name.replace(/\//g, "-")}.txt`;
+    writeFileSync(join(wt, file), name);
+    git(wt, "add", file);
     git(wt, "commit", "-qm", name);
   }
   return wt;
@@ -113,4 +114,100 @@ test("never touches the main checkout and refuses to run from a linked worktree"
 test("rejects unknown arguments", () => {
   const r = run(repo(), "--nope");
   assert.notEqual(r.status, 0);
+});
+
+// Squash-merge detection (offline, git merge-tree --write-tree).
+function squashMerge(dir, branch) {
+  git(dir, "merge", "-q", "--squash", branch);
+  git(dir, "commit", "-qm", `squash ${branch}`);
+}
+
+test("squash-merged slice is removed with --apply", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-8");
+  squashMerge(dir, "slice-8");
+  const r = run(dir, "--apply");
+  assert.equal(r.status, 0, r.stderr);
+  assert.ok(!existsSync(wt), r.stdout);
+  assert.equal(git(dir, "branch", "--list", "slice-8"), "");
+});
+
+test("squash-merged slice is still detected after the base moved on", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-8b");
+  squashMerge(dir, "slice-8b");
+  writeFileSync(join(dir, "later.txt"), "later");
+  git(dir, "add", "later.txt");
+  git(dir, "commit", "-qm", "later");
+  const r = run(dir, "--apply");
+  assert.ok(!existsSync(wt), r.stdout);
+});
+
+test("slice with an extra commit after the squash is kept as not merged", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-9");
+  squashMerge(dir, "slice-9");
+  writeFileSync(join(wt, "extra.txt"), "extra");
+  git(wt, "add", "extra.txt");
+  git(wt, "commit", "-qm", "extra");
+  const r = run(dir, "--apply");
+  assert.ok(existsSync(wt));
+  assert.match(r.stdout, /keep.*slice-9.*not merged/s);
+});
+
+test("conflicting slice is kept", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-10");
+  writeFileSync(join(wt, "a.txt"), "from slice\n");
+  git(wt, "add", "a.txt");
+  git(wt, "commit", "-qm", "slice edits a");
+  writeFileSync(join(dir, "a.txt"), "from main\n");
+  git(dir, "add", "a.txt");
+  git(dir, "commit", "-qm", "main edits a");
+  const r = run(dir, "--apply");
+  assert.ok(existsSync(wt));
+  assert.match(r.stdout, /keep.*slice-10.*not merged/s);
+});
+
+test("uncommitted-work message names the dirty files", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-11");
+  git(dir, "merge", "-q", "--ff-only", "slice-11");
+  writeFileSync(join(wt, "wip.txt"), "wip");
+  writeFileSync(join(wt, "wip2.txt"), "wip");
+  const r = run(dir, "--apply");
+  assert.ok(existsSync(wt));
+  assert.match(r.stdout, /2 untracked or modified files \(first: wip2?\.txt\)/);
+});
+
+test("a tag named like the slice branch cannot make an unmerged branch look merged", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-tag"); // has its own commit, not merged
+  git(dir, "tag", "slice-tag-merged", "main");
+  git(dir, "tag", "-f", "slice-tag", "main");
+  const r = run(dir, "--apply");
+  assert.equal(r.status, 0, r.stderr);
+  assert.ok(existsSync(wt));
+  assert.notEqual(git(dir, "branch", "--list", "slice-tag"), "");
+});
+
+test("keeps a merged worktree that holds an ignored secret file and names it", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-env");
+  git(dir, "merge", "-q", "--ff-only", "slice-env");
+  writeFileSync(join(dir, ".git", "info", "exclude"), "node_modules/\n.env\n", { flag: "a" });
+  writeFileSync(join(wt, ".env"), "TOKEN=x");
+  const r = run(dir, "--apply");
+  assert.ok(existsSync(wt));
+  assert.match(r.stdout, /^keep.*slice-env.*ignored.*\.env/m);
+});
+
+test("handles a slice branch with a slash in its name", () => {
+  const dir = repo();
+  const wt = slice(dir, "feat/slice-12");
+  git(dir, "merge", "-q", "--ff-only", "feat/slice-12");
+  const r = run(dir, "--apply");
+  assert.equal(r.status, 0, r.stderr);
+  assert.ok(!existsSync(wt));
+  assert.equal(git(dir, "branch", "--list", "feat/slice-12"), "");
 });

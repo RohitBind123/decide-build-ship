@@ -6,6 +6,11 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- The npm package no longer contains the project's own decisions log, spec, feature docs, ADRs, evidence or
+  backlog; a test checks what `npm pack` would publish.
+
 ### Added
 
 - `Cleanup` setting (`auto`, `ask` or `off`, default `ask`) and `Cleanup stop procs` in the `Build workflow`
@@ -16,6 +21,12 @@ All notable changes to this project are recorded here. The format follows
 - `skills/ship-slice/scripts/cleanup-slice.sh`: removes merged slice worktrees with their build output,
   merged local branches and stale worktree records after a merge. Dry run by default; keeps anything unmerged,
   dirty, locked or in use; never deletes remote branches. `ship-slice` now runs it as a required step.
+  Squash-merged slices are detected offline (`git merge-tree`, git 2.38+). It keeps a worktree that holds
+  ignored files such as `.env`, `*.pem`, `*.key`, `*.sqlite` or `*.db`, and deletes branches only at the exact
+  commit it checked.
+- The session-start hook reports how many merged worktrees are still on disk (count only, so it stays fast)
+  when the project has a `Build workflow` section. It only reports, never deletes, and stays silent when
+  `Cleanup: off` is set.
 
 ## [0.2.2] - 2026-11-15
 

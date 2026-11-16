@@ -22,6 +22,6 @@ jobs:
         with:
           node-version: "22"
       - name: Installer CLI tests
-        run: node --test cli/index.test.mjs cli/cleanup-slice.test.mjs
+        run: node --test cli/index.test.mjs cli/cleanup-slice.test.mjs cli/package.test.mjs cli/session-start.test.mjs
       - name: Package contents
         run: npm pack --dry-run
