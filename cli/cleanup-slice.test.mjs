@@ -114,3 +114,67 @@ test("rejects unknown arguments", () => {
   const r = run(repo(), "--nope");
   assert.notEqual(r.status, 0);
 });
+
+// Squash-merge detection (offline, git merge-tree --write-tree).
+function squashMerge(dir, branch) {
+  git(dir, "merge", "-q", "--squash", branch);
+  git(dir, "commit", "-qm", `squash ${branch}`);
+}
+
+test("squash-merged slice is removed with --apply", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-8");
+  squashMerge(dir, "slice-8");
+  const r = run(dir, "--apply");
+  assert.equal(r.status, 0, r.stderr);
+  assert.ok(!existsSync(wt), r.stdout);
+  assert.equal(git(dir, "branch", "--list", "slice-8"), "");
+});
+
+test("squash-merged slice is still detected after the base moved on", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-8b");
+  squashMerge(dir, "slice-8b");
+  writeFileSync(join(dir, "later.txt"), "later");
+  git(dir, "add", "later.txt");
+  git(dir, "commit", "-qm", "later");
+  const r = run(dir, "--apply");
+  assert.ok(!existsSync(wt), r.stdout);
+});
+
+test("slice with an extra commit after the squash is kept as not merged", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-9");
+  squashMerge(dir, "slice-9");
+  writeFileSync(join(wt, "extra.txt"), "extra");
+  git(wt, "add", "extra.txt");
+  git(wt, "commit", "-qm", "extra");
+  const r = run(dir, "--apply");
+  assert.ok(existsSync(wt));
+  assert.match(r.stdout, /keep.*slice-9.*not merged/s);
+});
+
+test("conflicting slice is kept", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-10");
+  writeFileSync(join(wt, "a.txt"), "from slice\n");
+  git(wt, "add", "a.txt");
+  git(wt, "commit", "-qm", "slice edits a");
+  writeFileSync(join(dir, "a.txt"), "from main\n");
+  git(dir, "add", "a.txt");
+  git(dir, "commit", "-qm", "main edits a");
+  const r = run(dir, "--apply");
+  assert.ok(existsSync(wt));
+  assert.match(r.stdout, /keep.*slice-10.*not merged/s);
+});
+
+test("uncommitted-work message names the dirty files", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-11");
+  git(dir, "merge", "-q", "--ff-only", "slice-11");
+  writeFileSync(join(wt, "wip.txt"), "wip");
+  writeFileSync(join(wt, "wip2.txt"), "wip");
+  const r = run(dir, "--apply");
+  assert.ok(existsSync(wt));
+  assert.match(r.stdout, /2 untracked or modified files \(first: wip2?\.txt\)/);
+});

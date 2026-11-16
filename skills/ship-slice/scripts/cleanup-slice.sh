@@ -1,6 +1,6 @@
 #!/bin/sh
 # Cleans up after slices: removes linked git worktrees (with their build output) and local branches that are
-# already merged, and prunes worktree records whose folder is gone.
+# already merged (including squash merges, detected offline), and prunes worktree records whose folder is gone.
 #
 # Usage (run from the main checkout):
 #   sh cleanup-slice.sh                       dry run: report what would be removed and what is kept
@@ -54,6 +54,19 @@ pids_in() {  # pids whose working directory is inside $1; empty when lsof is mis
     /^n/ { p = substr($0, 2); if (p == dir || index(p, dir "/") == 1) print pid }' | sort -u
 }
 
+# Offline squash-merge check: merging $1 into the base would change nothing (git 2.38+ merge-tree --write-tree).
+# Sets squash_note when git is too old to tell. Conflicts or a net change mean not merged.
+squash_merged() {
+  squash_note=""
+  out=$(git merge-tree --write-tree "$base" "$1" 2>/dev/null); rc=$?
+  if [ "$rc" -eq 0 ]; then
+    [ "$(echo "$out" | sed -n 1p)" = "$(git rev-parse "$base^{tree}")" ]
+    return
+  fi
+  if [ "$rc" -ne 1 ]; then squash_note="; this git is too old to detect squash merges (needs 2.38+), kept"; fi
+  return 1
+}
+
 keep() { printf 'keep    %s (%s): %s\n' "$1" "$2" "$3"; kept=$((kept + 1)); }
 
 handle() {  # path branch locked
@@ -61,11 +74,19 @@ handle() {  # path branch locked
   label="${branch:-detached}"
   if [ -z "$branch" ]; then keep "$path" "$label" "detached head, remove by hand if finished"; return; fi
   case "$abandon" in *" $branch "*) is_abandoned=1 ;; *) is_abandoned=0 ;; esac
-  if [ "$is_abandoned" -eq 0 ] && ! git merge-base --is-ancestor "$branch" "$base" 2>/dev/null; then
-    keep "$path" "$label" "not merged into $base (use --abandon $branch if the owner dropped it)"; return
+  force_delete=$is_abandoned
+  if [ "$is_abandoned" -eq 0 ] && ! git merge-base --is-ancestor "$branch" "$base" 2>/dev/null \
+    && ! squash_merged "$branch"; then
+    keep "$path" "$label" "not merged into $base$squash_note (use --abandon $branch if the owner dropped it)"; return
   fi
-  if [ -n "$(git -C "$path" status --porcelain 2>/dev/null)" ]; then
-    keep "$path" "$label" "uncommitted work"; return
+  # A squash-merged branch is not an ancestor of the base, so plain -d refuses it; -D is safe because the
+  # merge check above proved merging it would change nothing.
+  if [ "$is_abandoned" -eq 0 ] && ! git merge-base --is-ancestor "$branch" "$base" 2>/dev/null; then force_delete=1; fi
+  dirty=$(git -C "$path" status --porcelain 2>/dev/null)
+  if [ -n "$dirty" ]; then
+    dirty_count=$(echo "$dirty" | wc -l | tr -d ' ')
+    dirty_first=$(echo "$dirty" | sed -n 1p | cut -c4-)
+    keep "$path" "$label" "uncommitted work: $dirty_count untracked or modified files (first: $dirty_first)"; return
   fi
   if [ -n "$locked" ]; then keep "$path" "$label" "locked, its agent may still be running"; return; fi
   procs=$(pids_in "$path")
@@ -83,7 +104,7 @@ handle() {  # path branch locked
   size_kb=${size_kb:-0}
   if [ "$apply" -eq 1 ]; then
     if ! git worktree remove "$path" 2>/dev/null; then keep "$path" "$label" "git refused to remove it"; return; fi
-    if [ "$is_abandoned" -eq 1 ]; then git branch -D "$branch" >/dev/null 2>&1; else git branch -d "$branch" >/dev/null 2>&1; fi
+    if [ "$force_delete" -eq 1 ]; then git branch -D "$branch" >/dev/null 2>&1; else git branch -d "$branch" >/dev/null 2>&1; fi
   fi
   printf '%s %s (%s, %s MB)\n' "$mode" "$path" "$label" "$((size_kb / 1024))"
   removed=$((removed + 1))

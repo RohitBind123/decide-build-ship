@@ -88,6 +88,6 @@ you run it only with the owner's approval.
 By hand, when the script is unavailable: `git worktree list`, `git worktree remove <path>`,
 `git branch -d <branch>` (`-D` only for an abandoned branch you own), `git worktree prune`.
 
-Keep any worktree whose agent is still running. Never remove another session's worktree or branch. A slice that
-was squash-merged is not an ancestor of the base, so the script keeps it; confirm the merge, then pass
-`--abandon <branch>`.
+Keep any worktree whose agent is still running. Never remove another session's worktree or branch. The script detects
+squash merges offline (it checks that merging the branch into the base would change nothing), so it removes
+them without help. Pass `--abandon <branch>` only when a slice is not detected as merged and the owner dropped it.
