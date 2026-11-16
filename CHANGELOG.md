@@ -8,6 +8,10 @@ All notable changes to this project are recorded here. The format follows
 
 ### Added
 
+- `Cleanup` setting (`auto`, `ask` or `off`, default `ask`) and `Cleanup stop procs` in the `Build workflow`
+  section, read by `ship-slice` and `autopilot`; `autopilot` now cleans up after every slice, and `handoff`
+  flags merged slices whose worktree is still on disk. Documented in `docs/configuration.md` and the README.
+
 - `skills/ship-slice/scripts/cleanup-slice.sh`: removes merged slice worktrees with their build output,
   merged local branches and stale worktree records after a merge. Dry run by default; keeps anything unmerged,
   dirty, locked or in use; never deletes remote branches. `ship-slice` now runs it as a required step.

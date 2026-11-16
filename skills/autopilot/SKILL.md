@@ -65,6 +65,8 @@ For each slice, run the skills in order and let each one finish its own checklis
 4. `verify-slice`: changed-only gate, reviews, live check, evidence.
 5. `ship-slice`: merges and pushes under the standing approval when every precondition holds; in `per merge`
    mode, asks first.
+6. Cleanup: `ship-slice` step 4 runs the cleanup script as the `Cleanup` setting says. Do not start the next
+   slice, and do not call this one done, until that step has run (`off`: until you have said it was skipped).
 
 Update the roadmap status and the handoff file at every phase change. Log each step in the evidence folder,
 not only in the conversation.

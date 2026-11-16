@@ -57,5 +57,6 @@ Never put secrets, tokens or personal data in the file.
 1. Read the handoff file and the `Build workflow` section of `CLAUDE.md`.
 2. Check the real state before trusting the file: `git status`, `git log -1`, `git worktree list`, and whether
    the listed agents, ports and locks still exist.
-3. Report what matches and what has changed since the file was written.
+3. Report what matches and what has changed since the file was written. A listed slice that is already merged
+   but still has a worktree is leftover: say so and point to the `ship-slice` cleanup step; do not delete it here.
 4. Re-ask any owner question that is still open, then continue from the next step.

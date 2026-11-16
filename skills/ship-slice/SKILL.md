@@ -25,7 +25,7 @@ Ship progress:
 - [ ] 3. Merged the project's way; shared branches never force-pushed
 - [ ] 4. Push approved separately (unless covered)
 - [ ] 5. Wrap-up: statuses, changelog, backlog, handoff
-- [ ] 6. Cleanup script ran with --apply; its summary reported
+- [ ] 6. Cleanup done as the `Cleanup` setting says (or skipped on `off`); its summary reported
 ```
 
 ## 1. Preconditions
@@ -74,10 +74,14 @@ The production branch moves only on a release the owner approves. Release steps,
    changelog entry.
 2. Move deferred items, owner actions and blockers to the backlog, each with its source.
 3. Update the handoff file's "next step" to the next slice (`handoff` skill).
-4. Run the cleanup script from the main checkout, dry run first, then `--apply`
-   ([scripts/cleanup-slice.sh](scripts/cleanup-slice.sh), details in the release reference). It removes merged
+4. Clean up, following the project's `Cleanup` setting (`auto`, `ask` or `off`; default `ask`; the owner can
+   override it for a session by saying so). `auto`: run the cleanup script with `--apply`. `ask`: run it as a
+   dry run, show the list, then ask with AskUserQuestion before `--apply`. `off`: do not run it; say that
+   worktrees were left on disk. Add `--stop-procs` only when `Cleanup stop procs` is `yes`. The script
+   ([scripts/cleanup-slice.sh](scripts/cleanup-slice.sh), details in the release reference) removes merged
    worktrees with their build output, merged local branches and stale worktree records, and keeps anything with
-   unmerged commits, uncommitted work, a lock or a running process. Report its summary line. Do not mark the
-   slice done while it lists a worktree of this slice as kept without a reason you can state.
+   unmerged commits, uncommitted work, a lock or a running process. Report its summary line. With `auto` or
+   `ask`, do not mark the slice done while a worktree of this slice is still on disk without a reason you can
+   state.
 5. Ask the owner before starting the next slice, unless `autopilot` is running the milestone under a recorded
    standing approval.
