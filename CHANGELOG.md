@@ -8,6 +8,9 @@ All notable changes to this project are recorded here. The format follows
 
 ### Fixed
 
+- Cleanup no longer treats a freshly created slice worktree as merged: a branch with no commits of its own
+  yet (only its `branch: Created` reflog entry) is kept, and the session-start report does not count it.
+
 - The npm package no longer contains the project's own decisions log, spec, feature docs, ADRs, evidence or
   backlog; a test checks what `npm pack` would publish.
 
