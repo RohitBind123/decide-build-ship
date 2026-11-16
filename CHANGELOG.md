@@ -19,6 +19,9 @@ All notable changes to this project are recorded here. The format follows
   Squash-merged slices are detected offline (`git merge-tree`, git 2.38+). It keeps a worktree that holds
   ignored files such as `.env`, `*.pem`, `*.key`, `*.sqlite` or `*.db`, and deletes branches only at the exact
   commit it checked.
+- The session-start hook reports how many merged worktrees are still on disk (count only, so it stays fast)
+  when the project has a `Build workflow` section. It only reports, never deletes, and stays silent when
+  `Cleanup: off` is set.
 
 ## [0.2.2] - 2026-11-15
 
