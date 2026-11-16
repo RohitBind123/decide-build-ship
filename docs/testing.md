@@ -19,10 +19,10 @@ contents list, that the manifests agree, and that every eval case has a prompt a
 ## 1b. Installer CLI tests (free, no network)
 
 ```bash
-node --test cli/index.test.mjs
+node --test cli/index.test.mjs cli/cleanup-slice.test.mjs
 ```
 
-They run the npm installer against temporary folders: project and user installs, never overwriting, dry
+They (and the cleanup script tests) run the npm installer against temporary folders: project and user installs, never overwriting, dry
 run, skills only, `--dir`, `list`, `plugin`, version, and bad arguments.
 
 ## 2. Plugin validator (free, no network)

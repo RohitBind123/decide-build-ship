@@ -6,6 +6,12 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `skills/ship-slice/scripts/cleanup-slice.sh`: removes merged slice worktrees with their build output,
+  merged local branches and stale worktree records after a merge. Dry run by default; keeps anything unmerged,
+  dirty, locked or in use; never deletes remote branches. `ship-slice` now runs it as a required step.
+
 ## [0.2.2] - 2026-11-15
 
 ### Changed

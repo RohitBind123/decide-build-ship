@@ -67,11 +67,27 @@ below. Never delete the slice branch from the shared remote without asking.
 
 Each worktree holds a full checkout and its build output. After a slice is merged or abandoned:
 
+Use the script, from the main checkout. Dry run first, then apply:
+
 ```bash
-git worktree list                      # see what exists
-git worktree unlock <path>             # only if it is locked and its agent has finished
-git worktree remove <path>
-git branch -d <slice-or-builder-branch> # use -D only for an abandoned branch you own
+sh skills/ship-slice/scripts/cleanup-slice.sh            # report only
+sh skills/ship-slice/scripts/cleanup-slice.sh --apply    # remove what is safe
 ```
 
-Keep any worktree whose agent is still running. Never remove another session's worktree or branch.
+If the plugin is installed elsewhere, run the script from its installed path; it works on whichever repository
+you are in. Options: `--base <branch>` (the branch that must contain the slice; default is the branch checked
+out in the main checkout), `--abandon <branch>` (also remove an unmerged slice the owner dropped; repeatable),
+`--stop-procs` (stop dev servers and browsers running inside a worktree before removing it).
+
+It removes a linked worktree (and its `node_modules`, build output and caches) and its local branch only when
+the branch is merged into the base, the worktree has no uncommitted work, it is not locked and no process runs
+inside it. It keeps everything else and says why. It also deletes merged local branches that no worktree uses,
+and prunes worktree records whose folder is gone. It never deletes a remote branch: it prints the command, and
+you run it only with the owner's approval.
+
+By hand, when the script is unavailable: `git worktree list`, `git worktree remove <path>`,
+`git branch -d <branch>` (`-D` only for an abandoned branch you own), `git worktree prune`.
+
+Keep any worktree whose agent is still running. Never remove another session's worktree or branch. A slice that
+was squash-merged is not an ancestor of the base, so the script keeps it; confirm the merge, then pass
+`--abandon <branch>`.
