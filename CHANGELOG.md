@@ -10,7 +10,10 @@ All notable changes to this project are recorded here. The format follows
 
 - `skills/ship-slice/scripts/cleanup-slice.sh`: removes merged slice worktrees with their build output,
   merged local branches and stale worktree records after a merge. Dry run by default; keeps anything unmerged,
-  dirty, locked or in use; never deletes remote branches. Squash-merged slices are detected offline (`git merge-tree`, git 2.38+) and cleaned like any merged slice. `ship-slice` now runs it as a required step.
+  dirty, locked or in use; never deletes remote branches. `ship-slice` now runs it as a required step.
+  Squash-merged slices are detected offline (`git merge-tree`, git 2.38+). It keeps a worktree that holds
+  ignored files such as `.env`, `*.pem`, `*.key`, `*.sqlite` or `*.db`, and deletes branches only at the exact
+  commit it checked.
 
 ## [0.2.2] - 2026-11-15
 

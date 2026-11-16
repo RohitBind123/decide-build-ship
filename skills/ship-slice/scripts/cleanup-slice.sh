@@ -49,21 +49,25 @@ freed_kb=0
 
 pids_in() {  # pids whose working directory is inside $1; empty when lsof is missing
   command -v lsof >/dev/null 2>&1 || return 0
-  lsof -a -d cwd -Fpn 2>/dev/null | awk -v dir="$1" '
+  lsof -a -d cwd -Fpn 2>/dev/null | dir="$1" awk '
     /^p/ { pid = substr($0, 2) }
-    /^n/ { p = substr($0, 2); if (p == dir || index(p, dir "/") == 1) print pid }' | sort -u
+    /^n/ { p = substr($0, 2); d = ENVIRON["dir"]; if (p == d || index(p, d "/") == 1) print pid }' | sort -u
 }
 
 # Offline squash-merge check: merging $1 into the base would change nothing (git 2.38+ merge-tree --write-tree).
 # Sets squash_note when git is too old to tell. Conflicts or a net change mean not merged.
 squash_merged() {
   squash_note=""
-  out=$(git merge-tree --write-tree "$base" "$1" 2>/dev/null); rc=$?
+  out=$(git merge-tree --write-tree "refs/heads/$base" "$1" 2>/dev/null); rc=$?
   if [ "$rc" -eq 0 ]; then
-    [ "$(echo "$out" | sed -n 1p)" = "$(git rev-parse "$base^{tree}")" ]
+    [ "$(printf '%s\n' "$out" | sed -n 1p)" = "$(git rev-parse "refs/heads/$base^{tree}")" ]
     return
   fi
-  if [ "$rc" -ne 1 ]; then squash_note="; this git is too old to detect squash merges (needs 2.38+), kept"; fi
+  case "$rc" in
+    1) ;;
+    129) squash_note="; this git is too old to detect squash merges (needs 2.38+), kept" ;;
+    *) squash_note="; could not check for a squash merge, kept" ;;
+  esac
   return 1
 }
 
@@ -74,20 +78,29 @@ handle() {  # path branch locked
   label="${branch:-detached}"
   if [ -z "$branch" ]; then keep "$path" "$label" "detached head, remove by hand if finished"; return; fi
   case "$abandon" in *" $branch "*) is_abandoned=1 ;; *) is_abandoned=0 ;; esac
+  # Everything below uses this exact commit and full ref names, so a tag with the same name cannot be
+  # picked up and a commit that lands later is never deleted.
+  tip=$(git rev-parse -q --verify "refs/heads/$branch") || { keep "$path" "$label" "branch ref not found"; return; }
+  is_ancestor=0
+  git merge-base --is-ancestor "$tip" "refs/heads/$base" 2>/dev/null && is_ancestor=1
   force_delete=$is_abandoned
-  if [ "$is_abandoned" -eq 0 ] && ! git merge-base --is-ancestor "$branch" "$base" 2>/dev/null \
-    && ! squash_merged "$branch"; then
+  if [ "$is_abandoned" -eq 0 ] && [ "$is_ancestor" -eq 0 ] && ! squash_merged "$tip"; then
     keep "$path" "$label" "not merged into $base$squash_note (use --abandon $branch if the owner dropped it)"; return
   fi
   # A squash-merged branch is not an ancestor of the base, so plain -d refuses it; -D is safe because the
   # merge check above proved merging it would change nothing.
-  if [ "$is_abandoned" -eq 0 ] && ! git merge-base --is-ancestor "$branch" "$base" 2>/dev/null; then force_delete=1; fi
+  if [ "$is_abandoned" -eq 0 ] && [ "$is_ancestor" -eq 0 ]; then force_delete=1; fi
   dirty=$(git -C "$path" status --porcelain 2>/dev/null)
   if [ -n "$dirty" ]; then
-    dirty_count=$(echo "$dirty" | wc -l | tr -d ' ')
-    dirty_first=$(echo "$dirty" | sed -n 1p | cut -c4-)
+    dirty_count=$(printf '%s\n' "$dirty" | wc -l | tr -d ' ')
+    dirty_first=$(printf '%s\n' "$dirty" | sed -n 1p | cut -c4-)
     keep "$path" "$label" "uncommitted work: $dirty_count untracked or modified files (first: $dirty_first)"; return
   fi
+  # Ignored files are not dirty to git but git worktree remove deletes them. Never delete likely secrets.
+  secrets=$(git -C "$path" ls-files --others --ignored --exclude-standard --directory 2>/dev/null \
+    | grep -E '(^|/)(\.env[^/]*|[^/]*\.(pem|key|sqlite|db))$' | head -n 3 | tr '\n' ' ')
+  if [ -n "$secrets" ]; then keep "$path" "$label" "ignored files that may hold secrets or data: $secrets(move them, then run again)"; return; fi
+  if [ "$(git -C "$path" rev-parse HEAD 2>/dev/null)" != "$tip" ]; then keep "$path" "$label" "branch moved during the check"; return; fi
   if [ -n "$locked" ]; then keep "$path" "$label" "locked, its agent may still be running"; return; fi
   procs=$(pids_in "$path")
   if [ -n "$procs" ]; then
@@ -104,7 +117,8 @@ handle() {  # path branch locked
   size_kb=${size_kb:-0}
   if [ "$apply" -eq 1 ]; then
     if ! git worktree remove "$path" 2>/dev/null; then keep "$path" "$label" "git refused to remove it"; return; fi
-    if [ "$force_delete" -eq 1 ]; then git branch -D "$branch" >/dev/null 2>&1; else git branch -d "$branch" >/dev/null 2>&1; fi
+    # update-ref refuses when the branch no longer points at $tip, so unseen commits are never dropped.
+    if [ "$force_delete" -eq 1 ]; then git update-ref -d "refs/heads/$branch" "$tip" >/dev/null 2>&1; else git branch -d "$branch" >/dev/null 2>&1; fi
   fi
   printf '%s %s (%s, %s MB)\n' "$mode" "$path" "$label" "$((size_kb / 1024))"
   removed=$((removed + 1))

@@ -28,13 +28,14 @@ function repo() {
 }
 
 function slice(dir, name, { commit = true } = {}) {
-  const wt = join(dir, "..", `${name}-wt-${Date.now()}${Math.random().toString(36).slice(2, 6)}`);
+  const wt = join(dir, "..", `${name.replace(/\//g, "-")}-wt-${Date.now()}${Math.random().toString(36).slice(2, 6)}`);
   git(dir, "worktree", "add", "-q", "-b", name, wt);
   mkdirSync(join(wt, "node_modules"), { recursive: true });
   writeFileSync(join(wt, "node_modules", "big.bin"), "x".repeat(2048));
   if (commit) {
-    writeFileSync(join(wt, `${name}.txt`), name);
-    git(wt, "add", `${name}.txt`);
+    const file = `${name.replace(/\//g, "-")}.txt`;
+    writeFileSync(join(wt, file), name);
+    git(wt, "add", file);
     git(wt, "commit", "-qm", name);
   }
   return wt;
@@ -177,4 +178,36 @@ test("uncommitted-work message names the dirty files", () => {
   const r = run(dir, "--apply");
   assert.ok(existsSync(wt));
   assert.match(r.stdout, /2 untracked or modified files \(first: wip2?\.txt\)/);
+});
+
+test("a tag named like the slice branch cannot make an unmerged branch look merged", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-tag"); // has its own commit, not merged
+  git(dir, "tag", "slice-tag-merged", "main");
+  git(dir, "tag", "-f", "slice-tag", "main");
+  const r = run(dir, "--apply");
+  assert.equal(r.status, 0, r.stderr);
+  assert.ok(existsSync(wt));
+  assert.notEqual(git(dir, "branch", "--list", "slice-tag"), "");
+});
+
+test("keeps a merged worktree that holds an ignored secret file and names it", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-env");
+  git(dir, "merge", "-q", "--ff-only", "slice-env");
+  writeFileSync(join(dir, ".git", "info", "exclude"), "node_modules/\n.env\n", { flag: "a" });
+  writeFileSync(join(wt, ".env"), "TOKEN=x");
+  const r = run(dir, "--apply");
+  assert.ok(existsSync(wt));
+  assert.match(r.stdout, /^keep.*slice-env.*ignored.*\.env/m);
+});
+
+test("handles a slice branch with a slash in its name", () => {
+  const dir = repo();
+  const wt = slice(dir, "feat/slice-12");
+  git(dir, "merge", "-q", "--ff-only", "feat/slice-12");
+  const r = run(dir, "--apply");
+  assert.equal(r.status, 0, r.stderr);
+  assert.ok(!existsSync(wt));
+  assert.equal(git(dir, "branch", "--list", "feat/slice-12"), "");
 });
