@@ -5,3 +5,6 @@ evals/results/
 .DS_Store
 *.swp
 __pycache__/
+
+# Dependencies and build output
+node_modules/
