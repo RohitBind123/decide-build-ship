@@ -37,7 +37,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test cli/index.test.mjs cli/cleanup-slice.test.mjs && python3 scripts/check_skills.py",
+    "test": "node --test cli/index.test.mjs cli/cleanup-slice.test.mjs cli/session-start.test.mjs && python3 scripts/check_skills.py",
     "prepublishOnly": "npm test"
   },
   "publishConfig": {

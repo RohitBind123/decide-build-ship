@@ -22,14 +22,16 @@ function makeProject({ section = true, settings = "" } = {}) {
   return { root, repo };
 }
 
-function addWorktree(p, name, { extraCommit = false } = {}) {
+// merged: the slice has its own commit that is already merged into main (a finished slice).
+function addWorktree(p, name, { extraCommit = false, merged = false } = {}) {
   const dir = join(p.root, name);
   git(p.repo, "worktree", "add", "-q", "-b", name, dir);
-  if (extraCommit) {
+  if (extraCommit || merged) {
     writeFileSync(join(dir, "f.txt"), "x");
     git(dir, "add", "f.txt");
     git(dir, "commit", "-q", "-m", "work");
   }
+  if (merged) git(p.repo, "merge", "-q", "--ff-only", name);
 }
 
 function runIn(dir) {
@@ -46,13 +48,13 @@ const LINE = /merged worktrees? (is|are) still on disk/;
 test("merged worktree: report line with count appears", () => {
   const p = makeProject();
   try {
-    addWorktree(p, "done-a");
+    addWorktree(p, "done-a", { merged: true });
     const r = run(p);
     assert.match(
       r.out,
       /1 merged worktree is still on disk \(about \d+ MB\)\. Run the ship-slice cleanup script \(dry run first\)\./,
     );
-    addWorktree(p, "done-b");
+    addWorktree(p, "done-b", { merged: true });
     assert.match(run(p).out, /2 merged worktrees are still on disk/);
     assert.equal(r.code, 0);
   } finally {
@@ -78,7 +80,7 @@ test("Cleanup: off prints no worktree line; auto and ask do", () => {
   const auto = makeProject({ settings: "- Cleanup: auto" });
   const ask = makeProject({ settings: "- Cleanup: ask" });
   try {
-    for (const p of [off, auto, ask]) addWorktree(p, "done");
+    for (const p of [off, auto, ask]) addWorktree(p, "done", { merged: true });
     const r = run(off);
     assert.doesNotMatch(r.out, LINE);
     assert.equal(r.code, 0);
@@ -92,7 +94,7 @@ test("Cleanup: off prints no worktree line; auto and ask do", () => {
 test("no Build workflow section: no output", () => {
   const p = makeProject({ section: false });
   try {
-    addWorktree(p, "done");
+    addWorktree(p, "done", { merged: true });
     const r = run(p);
     assert.equal(r.out, "");
     assert.equal(r.code, 0);
@@ -106,7 +108,7 @@ test("exit code is 0 for removed worktree folder, non-git dir and missing CLAUDE
   const plain = mkdtempSync(join(tmpdir(), "dbs-s3-plain-"));
   const empty = mkdtempSync(join(tmpdir(), "dbs-s3-empty-"));
   try {
-    addWorktree(p, "gone");
+    addWorktree(p, "gone", { merged: true });
     rmSync(join(p.root, "gone"), { recursive: true, force: true });
     const r = run(p);
     assert.doesNotMatch(r.out, LINE);

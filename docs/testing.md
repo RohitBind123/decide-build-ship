@@ -19,7 +19,7 @@ contents list, that the manifests agree, and that every eval case has a prompt a
 ## 1b. Installer CLI tests (free, no network)
 
 ```bash
-node --test cli/index.test.mjs cli/cleanup-slice.test.mjs
+node --test cli/index.test.mjs cli/cleanup-slice.test.mjs cli/session-start.test.mjs
 ```
 
 They (and the cleanup script tests) run the npm installer against temporary folders: project and user installs, never overwriting, dry
