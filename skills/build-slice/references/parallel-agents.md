@@ -69,5 +69,5 @@ Choose the model for the brief from `Models per task` in `CLAUDE.md`.
 
 ## Cleaning up
 
-After the slice is merged or abandoned, remove the builders' worktrees and local branches (see the
-`ship-slice` skill). Keep only worktrees whose agent is still running.
+After the slice is merged or abandoned, remove the builders' worktrees and local branches with the
+`ship-slice` cleanup script. Keep only worktrees whose agent is still running.
