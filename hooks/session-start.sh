@@ -37,6 +37,8 @@ report_merged_worktrees() {
     [ -d "$wt_path" ] || continue
     [ "$wt_path" = "$here" ] && continue
     git -C "$project_dir" merge-base --is-ancestor "$wt_branch" "$base" 2>/dev/null || continue
+    # A new slice branch has only its "branch: Created" reflog entry and looks merged; skip it.
+    git -C "$project_dir" reflog show --format='%gs' "$wt_branch" 2>/dev/null | grep -qv '^branch: Created' || continue
     count=$((count + 1))
   done <<EOF
 $candidates

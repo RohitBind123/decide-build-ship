@@ -27,8 +27,8 @@ function addWorktree(p, name, { extraCommit = false, merged = false } = {}) {
   const dir = join(p.root, name);
   git(p.repo, "worktree", "add", "-q", "-b", name, dir);
   if (extraCommit || merged) {
-    writeFileSync(join(dir, "f.txt"), "x");
-    git(dir, "add", "f.txt");
+    writeFileSync(join(dir, `${name}.txt`), "x");
+    git(dir, "add", `${name}.txt`);
     git(dir, "commit", "-q", "-m", "work");
   }
   if (merged) git(p.repo, "merge", "-q", "--ff-only", name);
@@ -159,5 +159,15 @@ test("Cleanup: Off and Cleanup: `off` also silence the report", () => {
     } finally {
       rmSync(p.root, { recursive: true, force: true });
     }
+  }
+});
+
+test("a fresh worktree with no commits of its own is not reported as merged", () => {
+  const p = makeProject();
+  try {
+    addWorktree(p, "fresh");
+    assert.doesNotMatch(run(p).out, LINE);
+  } finally {
+    rmSync(p.root, { recursive: true, force: true });
   }
 });

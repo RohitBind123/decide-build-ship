@@ -211,3 +211,22 @@ test("handles a slice branch with a slash in its name", () => {
   assert.ok(!existsSync(wt));
   assert.equal(git(dir, "branch", "--list", "feat/slice-12"), "");
 });
+
+test("keeps a freshly created worktree that has no commits of its own yet", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-new", { commit: false });
+  const r = run(dir, "--apply");
+  assert.equal(r.status, 0, r.stderr);
+  assert.ok(existsSync(wt));
+  assert.match(r.stdout, /^keep.*slice-new.*no commits of its own/m);
+});
+
+test("keeps a fresh worktree even after the base branch moved on", () => {
+  const dir = repo();
+  const wt = slice(dir, "slice-new2", { commit: false });
+  writeFileSync(join(dir, "b.txt"), "b");
+  git(dir, "add", "b.txt");
+  git(dir, "commit", "-qm", "more");
+  run(dir, "--apply");
+  assert.ok(existsSync(wt));
+});

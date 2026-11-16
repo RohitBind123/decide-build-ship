@@ -71,6 +71,12 @@ squash_merged() {
   return 1
 }
 
+# A branch has its own history when its reflog holds more than the "branch: Created" entry. A brand-new
+# slice branch has none, and looks merged because it sits on a commit the base already contains.
+has_own_history() {
+  git reflog show --format='%gs' "refs/heads/$1" 2>/dev/null | grep -qv '^branch: Created'
+}
+
 keep() { printf 'keep    %s (%s): %s\n' "$1" "$2" "$3"; kept=$((kept + 1)); }
 
 handle() {  # path branch locked
@@ -83,6 +89,9 @@ handle() {  # path branch locked
   tip=$(git rev-parse -q --verify "refs/heads/$branch") || { keep "$path" "$label" "branch ref not found"; return; }
   is_ancestor=0
   git merge-base --is-ancestor "$tip" "refs/heads/$base" 2>/dev/null && is_ancestor=1
+  if [ "$is_abandoned" -eq 0 ] && [ "$is_ancestor" -eq 1 ] && ! has_own_history "$branch"; then
+    keep "$path" "$label" "no commits of its own yet (a new slice, or its history is gone; use --abandon $branch to remove it anyway)"; return
+  fi
   force_delete=$is_abandoned
   if [ "$is_abandoned" -eq 0 ] && [ "$is_ancestor" -eq 0 ] && ! squash_merged "$tip"; then
     keep "$path" "$label" "not merged into $base$squash_note (use --abandon $branch if the owner dropped it)"; return
